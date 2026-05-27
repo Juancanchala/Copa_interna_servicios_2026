@@ -1,0 +1,1785 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Copa Servicios Públicos 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@400;600;700&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.2.3/css/flag-icons.min.css"/>
+<style>
+  :root {
+    --gold: #c9a84c;
+    --gold-light: #f0d080;
+    --gold-dark: #8a6a20;
+    --navy: #060d1f;
+    --navy-mid: #0d1e3a;
+    --navy-light: #162847;
+    --white: #ffffff;
+    --muted: rgba(255,255,255,0.45);
+    --green: #00e676;
+    --red: #ff4444;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--navy);  
+    color: var(--white);
+    font-family: 'Barlow', sans-serif;
+    overflow-x: hidden;
+    cursor: none;
+  }
+
+  /* CUSTOM CURSOR */
+  .cursor {
+    width: 32px; height: 32px;
+    background: none;
+    border-radius: 0;
+    position: fixed;
+    pointer-events: none;
+    z-index: 9999;
+    transition: opacity 0.2s;
+    transform: translate(-50%, -50%);
+    font-size: 24px;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    filter: drop-shadow(0 0 4px rgba(255,255,255,0.25));
+  }
+  .cursor-ring {
+    width: 36px; height: 36px;
+    border: 1.5px solid rgba(201,168,76,0.5);
+    border-radius: 50%;
+    position: fixed;
+    pointer-events: none;
+    z-index: 9998;
+    transform: translate(-50%, -50%);
+    transition: all 0.3s ease;
+  }
+
+  /* CANVAS */
+  #particles {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  /* NOISE TEXTURE OVERLAY */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    background-size: 200px;
+    pointer-events: none;
+    z-index: 1;
+    opacity: 0.6;
+  }
+
+  /* STADIUM LINES BG */
+  .stadium-lines {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+    pointer-events: none;
+  }
+  .stadium-lines::after {
+    content: '';
+    position: absolute;
+    bottom: -30%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 160%;
+    height: 80%;
+    border-radius: 50% 50% 0 0;
+    border: 1px solid rgba(201,168,76,0.06);
+    box-shadow:
+      0 0 0 40px rgba(201,168,76,0.03),
+      0 0 0 80px rgba(201,168,76,0.02),
+      0 0 0 140px rgba(201,168,76,0.015),
+      0 0 0 200px rgba(201,168,76,0.01);
+  }
+
+  /* CONTENT */
+  .content { position: relative; z-index: 2; }
+
+  /* NAV */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    padding: 1.2rem 3rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: linear-gradient(to bottom, rgba(6,13,31,0.95), transparent);
+    backdrop-filter: blur(2px);
+  }
+  .nav-logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.4rem;
+    letter-spacing: 3px;
+    color: var(--gold);
+  }
+  .nav-links {
+    display: flex;
+    gap: 2.5rem;
+    list-style: none;
+  }
+  .nav-links a {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 0.85rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    text-decoration: none;
+    transition: color 0.3s;
+  }
+  .nav-links a:hover { color: var(--gold); }
+  .nav-pts-btn {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1rem;
+    letter-spacing: 2px;
+    background: rgba(201,168,76,0.12);
+    border: 1px solid rgba(201,168,76,0.35);
+    color: var(--gold);
+    width: 34px; height: 34px;
+    border-radius: 50%;
+    cursor: none;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s;
+    flex-shrink: 0;
+  }
+  .nav-pts-btn:hover { background: rgba(201,168,76,0.25); transform: scale(1.1); }
+
+  /* MODAL PUNTOS */
+  .pts-overlay {
+    position: fixed; inset: 0; z-index: 800;
+    background: rgba(0,0,0,0.88);
+    backdrop-filter: blur(6px);
+    display: none; align-items: center; justify-content: center; padding: 2rem;
+  }
+  .pts-overlay.open { display: flex; }
+  .pts-modal {
+    background: var(--navy-mid);
+    border: 1px solid rgba(201,168,76,0.25);
+    max-width: 680px; width: 100%;
+    max-height: 88vh; overflow-y: auto;
+    padding: 2.5rem;
+    position: relative;
+    animation: fadeUp .35s ease forwards;
+  }
+  .pts-modal::-webkit-scrollbar { width: 4px; }
+  .pts-modal::-webkit-scrollbar-track { background: transparent; }
+  .pts-modal::-webkit-scrollbar-thumb { background: rgba(201,168,76,0.3); }
+  .pts-close {
+    position: absolute; top: 1.2rem; right: 1.2rem;
+    background: none; border: none; color: var(--muted);
+    font-family: 'Bebas Neue', sans-serif; font-size: 1rem; letter-spacing: 2px;
+    cursor: none; transition: color .2s;
+  }
+  .pts-close:hover { color: var(--white); }
+  .pts-title {
+    font-family: 'Bebas Neue', sans-serif; font-size: 1.8rem; letter-spacing: 4px;
+    color: var(--gold); margin-bottom: .3rem;
+  }
+  .pts-sub {
+    font-family: 'Barlow Condensed', sans-serif; font-size: .75rem;
+    letter-spacing: 2px; text-transform: uppercase; color: var(--muted);
+    margin-bottom: 2rem;
+  }
+  .pts-cat {
+    margin-bottom: 1.8rem;
+  }
+  .pts-cat-title {
+    font-family: 'Barlow Condensed', sans-serif; font-size: .68rem;
+    letter-spacing: 3px; text-transform: uppercase; color: var(--gold);
+    border-bottom: 1px solid rgba(201,168,76,0.2); padding-bottom: .4rem;
+    margin-bottom: .9rem; display: flex; align-items: center; gap: .5rem;
+  }
+  .pts-row {
+    display: flex; align-items: flex-start; gap: 1rem;
+    padding: .55rem 0; border-bottom: 1px solid rgba(255,255,255,0.04);
+  }
+  .pts-row:last-child { border-bottom: none; }
+  .pts-icon { font-size: 1.1rem; width: 24px; flex-shrink: 0; text-align: center; margin-top: 1px; }
+  .pts-info { flex: 1; }
+  .pts-act {
+    font-family: 'Barlow Condensed', sans-serif; font-size: .92rem;
+    letter-spacing: .5px; color: var(--white); line-height: 1.2;
+  }
+  .pts-obs {
+    font-family: 'Barlow', sans-serif; font-size: .75rem;
+    color: var(--muted); margin-top: 1px;
+  }
+  .pts-val {
+    font-family: 'Bebas Neue', sans-serif; font-size: 1.3rem;
+    color: var(--gold); letter-spacing: 1px; white-space: nowrap; flex-shrink: 0;
+  }
+
+  /* HERO */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 6rem 2rem 4rem;
+    position: relative;
+  }
+
+  .hero-eyebrow {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 0.78rem;
+    letter-spacing: 5px;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 1.5rem;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.2s forwards;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+  .hero-eyebrow::before, .hero-eyebrow::after {
+    content: '';
+    display: block;
+    width: 40px;
+    height: 1px;
+    background: var(--gold);
+    opacity: 0.5;
+  }
+
+  .hero-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(5rem, 14vw, 11rem);
+    line-height: 0.88;
+    letter-spacing: 4px;
+    margin-bottom: 0.2em;
+    opacity: 0;
+    animation: fadeUp 0.9s 0.35s forwards;
+  }
+  .hero-title .line1 { display: block; color: var(--white); }
+  .hero-title .line2 {
+    display: block;
+    color: transparent;
+    -webkit-text-stroke: 1.5px rgba(201,168,76,0.6);
+  }
+  .hero-title .line3 {
+    display: block;
+    color: var(--gold);
+    font-size: 0.45em;
+    letter-spacing: 12px;
+    margin-top: 0.3em;
+  }
+
+  .hero-sub {
+    font-size: 1rem;
+    color: var(--muted);
+    max-width: 440px;
+    line-height: 1.7;
+    margin: 1.5rem auto 3rem;
+    opacity: 0;
+    animation: fadeUp 0.9s 0.5s forwards;
+    font-weight: 300;
+  }
+
+  /* COUNTDOWN */
+  .countdown {
+    display: flex;
+    gap: 0;
+    align-items: stretch;
+    margin-bottom: 3.5rem;
+    opacity: 0;
+    animation: fadeUp 0.9s 0.65s forwards;
+  }
+  .countdown-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1.2rem 2rem;
+    position: relative;
+  }
+  .countdown-item:not(:last-child)::after {
+    content: ':';
+    position: absolute;
+    right: -2px;
+    top: 50%;
+    transform: translateY(-60%);
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2.5rem;
+    color: var(--gold-dark);
+  }
+  .countdown-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(3rem, 6vw, 5rem);
+    line-height: 1;
+    color: var(--white);
+    position: relative;
+  }
+  .countdown-num::before {
+    content: attr(data-val);
+    position: absolute;
+    inset: 0;
+    color: var(--gold);
+    clip-path: inset(0 0 60% 0);
+    opacity: 0.3;
+  }
+  .countdown-label {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 0.65rem;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-top: 4px;
+  }
+  .countdown-divider {
+    width: 1px;
+    background: linear-gradient(to bottom, transparent, rgba(201,168,76,0.3), transparent);
+    margin: 0.8rem 0;
+  }
+
+  /* CTA BUTTONS */
+  .hero-ctas {
+    display: flex;
+    gap: 1rem;
+    opacity: 0;
+    animation: fadeUp 0.9s 0.8s forwards;
+  }
+  .btn-primary {
+    background: var(--gold);
+    color: var(--navy);
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 0.85rem;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    font-weight: 700;
+    padding: 1rem 2.5rem;
+    border: none;
+    cursor: none;
+    transition: all 0.3s;
+    position: relative;
+    overflow: hidden;
+  }
+  .btn-primary::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--white);
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+  }
+  .btn-primary:hover::before { transform: translateX(0); }
+  .btn-primary span { position: relative; z-index: 1; }
+  .btn-secondary {
+    background: transparent;
+    color: var(--white);
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 0.85rem;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    font-weight: 600;
+    padding: 1rem 2.5rem;
+    border: 1px solid rgba(255,255,255,0.2);
+    cursor: none;
+    transition: all 0.3s;
+  }
+  .btn-secondary:hover {
+    border-color: var(--gold);
+    color: var(--gold);
+  }
+
+  /* SCROLL INDICATOR */
+  .scroll-hint {
+    position: absolute;
+    bottom: 2.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    opacity: 0;
+    animation: fadeIn 1s 1.5s forwards;
+  }
+  .scroll-hint span {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 0.65rem;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .scroll-line {
+    width: 1px;
+    height: 50px;
+    background: linear-gradient(to bottom, var(--gold), transparent);
+    animation: scrollPulse 2s 1.5s infinite;
+  }
+
+  /* STATS BAR */
+  .stats-bar {
+    border-top: 1px solid rgba(201,168,76,0.12);
+    border-bottom: none;
+    background: rgba(13,30,58,0.6);
+    backdrop-filter: blur(10px);
+    padding: 2rem 0;
+  }
+
+  /* ---- FLAG RIBBON ---- */
+  .flag-ribbon-wrap {
+    overflow: hidden;
+    background: rgba(5,15,35,0.7);
+    border-top: 1px solid rgba(201,168,76,0.08);
+    border-bottom: 1px solid rgba(201,168,76,0.12);
+    padding: 1.1rem 0;
+    margin-bottom: 5rem;
+    mask-image: linear-gradient(to right, transparent 0%, black 6%, black 94%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to right, transparent 0%, black 6%, black 94%, transparent 100%);
+  }
+  .flag-ribbon-track {
+    display: flex;
+    align-items: center;
+    gap: 2.8rem;
+    width: max-content;
+    animation: ribbon-scroll 28s linear infinite;
+  }
+  .flag-ribbon-wrap:hover .flag-ribbon-track { animation-play-state: paused; }
+  .flag-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.3rem;
+    flex-shrink: 0;
+    user-select: none;
+  }
+  .flag-wave {
+    width: 68px;
+    height: 46px;
+    display: block;
+    border-radius: 3px;
+    filter: drop-shadow(0 4px 10px rgba(0,0,0,0.6));
+    object-fit: cover;
+  }
+  .flag-name {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 0.62rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.4);
+  }
+  @keyframes ribbon-scroll {
+    0%   { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+  .stats-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    padding: 0 3rem;
+  }
+  .stat-item {
+    text-align: center;
+    padding: 1rem;
+    position: relative;
+  }
+  .stat-item:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 15%;
+    height: 70%;
+    width: 1px;
+    background: rgba(201,168,76,0.15);
+  }
+  .stat-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 3.5rem;
+    line-height: 1;
+    color: var(--gold);
+    display: block;
+  }
+  .stat-label {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 0.75rem;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-top: 6px;
+  }
+
+  /* SECTION */
+  section {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 3rem 6rem;
+  }
+  .section-tag {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 0.7rem;
+    letter-spacing: 5px;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 0.8rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+  .section-tag::before {
+    content: '';
+    display: block;
+    width: 24px;
+    height: 1px;
+    background: var(--gold);
+  }
+  .section-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(2.5rem, 5vw, 4rem);
+    letter-spacing: 2px;
+    line-height: 1;
+    margin-bottom: 0.5rem;
+  }
+
+  /* TEAMS GRID */
+  .teams-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-top: 3rem;
+  }
+  .team-card {
+    background: var(--navy-mid);
+    border: 1px solid rgba(201,168,76,0.1);
+    padding: 1.5rem 1rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    cursor: none;
+  }
+  .team-card::before {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 2px;
+    background: var(--gold);
+    transform: scaleX(0);
+    transition: transform 0.4s ease;
+  }
+  .team-card:hover {
+    background: var(--navy-light);
+    border-color: rgba(201,168,76,0.35);
+    transform: translateY(-6px);
+  }
+  .team-card:hover::before { transform: scaleX(1); }
+  .team-card .rank {
+    position: absolute;
+    top: 10px; right: 12px;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.2rem;
+    color: rgba(201,168,76,0.2);
+  }
+  .team-card .flag { margin-bottom: 0.8rem; display: flex; justify-content: center; }
+  .team-card .flag .fi { font-size: 2.8rem; border-radius: 4px; }
+  .team-card .name {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--white);
+    display: block;
+  }
+  .team-card .group-badge {
+    display: inline-block;
+    margin-top: 0.6rem;
+    padding: 3px 10px;
+    background: rgba(201,168,76,0.1);
+    border: 1px solid rgba(201,168,76,0.2);
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 0.65rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--gold);
+  }
+
+  /* LEADERBOARD */
+  .leaderboard-wrap { margin-top: 3rem; }
+  .lb-top3 {
+    display: grid;
+    grid-template-columns: 1fr 1.15fr 1fr;
+    gap: 12px;
+    margin-bottom: 16px;
+    align-items: end;
+  }
+  .podium-card {
+    background: var(--navy-mid);
+    border: 1px solid rgba(201,168,76,0.12);
+    padding: 1.5rem 1rem 1.2rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.3s;
+  }
+  .podium-card.first {
+    border-color: rgba(201,168,76,0.5);
+    background: linear-gradient(160deg, rgba(201,168,76,0.08) 0%, var(--navy-mid) 60%);
+  }
+  .podium-crown {
+    font-size: 1.8rem;
+    margin-bottom: 0.5rem;
+    display: block;
+    animation: float 3s ease-in-out infinite;
+  }
+  .podium-flag { display: flex; justify-content: center; margin-bottom: 0.5rem; }
+  .podium-flag .fi { font-size: 2.5rem; border-radius: 4px; }
+  .podium-name {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+  .podium-group { font-size: 0.75rem; color: var(--muted); margin-bottom: 0.8rem; }
+  .podium-score {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2.8rem;
+    color: var(--gold);
+    line-height: 1;
+  }
+  .podium-pts { font-size: 0.65rem; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); }
+  .podium-slot-empty { font-size: 2.2rem; margin: 0.3rem 0 0.5rem; opacity: 0.35; }
+  .podium-pending { color: var(--muted) !important; font-size: 0.95rem !important; letter-spacing: 1px; }
+  .section-sub { color: var(--muted); font-size: 0.82rem; letter-spacing: 1px; margin-top: 0.4rem; }
+  .podium-medal {
+    position: absolute;
+    top: 12px; left: 12px;
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 0.9rem;
+  }
+  .medal-1 { background: var(--gold); color: var(--navy); }
+  .medal-2 { background: #b0b8c8; color: var(--navy); }
+  .medal-3 { background: #cd7f44; color: var(--navy); }
+
+  .lb-rows { display: flex; flex-direction: column; gap: 6px; }
+  .lb-row {
+    display: grid;
+    grid-template-columns: 32px 28px 1fr 120px 70px;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    background: var(--navy-mid);
+    border: 1px solid rgba(201,168,76,0.07);
+    transition: all 0.3s;
+    cursor: none;
+  }
+  .lb-row:hover {
+    background: var(--navy-light);
+    border-color: rgba(201,168,76,0.2);
+    transform: translateX(4px);
+  }
+  .lb-pos {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.1rem;
+    color: var(--muted);
+    text-align: center;
+  }
+  .lb-flag { display: flex; align-items: center; }
+  .lb-flag .fi { font-size: 1.4rem; border-radius: 2px; }
+  .lb-info .lb-name {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+  }
+  .lb-info .lb-grp { font-size: 0.72rem; color: var(--muted); }
+  .lb-bar-wrap {
+    height: 4px;
+    background: rgba(255,255,255,0.06);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .lb-bar-fill {
+    height: 100%;
+    background: linear-gradient(to right, var(--gold-dark), var(--gold));
+    border-radius: 2px;
+    transition: width 1.5s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .lb-score-val {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.4rem;
+    color: var(--gold);
+    text-align: right;
+  }
+
+  /* EVENTS */
+  .events-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+    margin-top: 3rem;
+  }
+  .event-card.card-solo {
+    grid-column: 1 / -1;
+    max-width: calc(50% - 8px);
+    margin: 0 auto;
+    width: 100%;
+  }
+  .event-card {
+    background: var(--navy-mid);
+    border: 1px solid rgba(201,168,76,0.1);
+    position: relative;
+    transition: border-color 0.4s, transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    cursor: none;
+    perspective: 1200px;
+  }
+  .event-card::after {
+    content: '';
+    position: absolute;
+    top: 0; right: 0;
+    width: 80px; height: 80px;
+    background: radial-gradient(circle at top right, rgba(201,168,76,0.08), transparent 70%);
+  }
+  .event-card:hover {
+    border-color: rgba(201,168,76,0.3);
+    transform: translateY(-4px);
+  }
+  .event-card.featured {
+    border-color: rgba(201,168,76,0.35);
+    background: linear-gradient(135deg, rgba(201,168,76,0.06) 0%, var(--navy-mid) 50%);
+  }
+
+  /* FLIP CARD */
+  .card-inner {
+    position: relative;
+    transition: transform 0.65s cubic-bezier(0.4, 0.2, 0.2, 1);
+    transform-style: preserve-3d;
+  }
+  .event-card.flipped .card-inner { transform: rotateY(180deg); }
+  .card-front {
+    position: relative;
+    padding: 2rem;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+  }
+  .card-back {
+    position: absolute;
+    inset: 0;
+    padding: 1.8rem 2rem;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    transform: rotateY(180deg);
+    background: linear-gradient(135deg, rgba(201,168,76,0.1) 0%, var(--navy-light) 60%);
+    border: 1px solid rgba(201,168,76,0.4);
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
+  }
+  .card-back-label {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 0.68rem;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--gold);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .card-back-label::before {
+    content: '';
+    display: block;
+    width: 16px; height: 1px;
+    background: var(--gold);
+  }
+  .card-back-steps {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+    flex: 1;
+  }
+  .card-back-steps li {
+    font-size: 0.83rem;
+    color: rgba(255,255,255,0.82);
+    line-height: 1.5;
+    display: flex;
+    gap: 0.5rem;
+  }
+  .card-back-steps li::before {
+    content: '›';
+    color: var(--gold);
+    flex-shrink: 0;
+    font-size: 1.1rem;
+    line-height: 1.3;
+  }
+  .card-date {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 0.68rem;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--gold);
+    background: rgba(201,168,76,0.08);
+    border: 1px solid rgba(201,168,76,0.2);
+    padding: 3px 10px;
+    margin-top: 0.6rem;
+  }
+  .card-flip-hint {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 0.62rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-top: 0.8rem;
+    opacity: 0.7;
+  }
+  .card-front-cta {
+    display: inline-block;
+    margin-top: 1rem;
+    padding: 0.5rem 1.1rem;
+    background: var(--gold);
+    color: var(--navy);
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 0.82rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    text-decoration: none;
+    border-radius: 4px;
+    transition: background 0.2s, transform 0.15s;
+  }
+  .card-front-cta:hover { background: var(--gold-light); transform: translateX(3px); }
+  .card-back-cta {
+    display: inline-block;
+    margin-top: 1rem;
+    padding: 0.45rem 1rem;
+    background: var(--gold);
+    color: var(--navy);
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    text-decoration: none;
+    border-radius: 4px;
+    transition: background 0.2s, transform 0.15s;
+    align-self: flex-start;
+  }
+  .card-back-cta:hover { background: var(--gold-light); transform: translateX(3px); }
+  .card-back-hint {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 0.62rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    text-align: right;
+    margin-top: auto;
+    padding-top: 0.5rem;
+  }
+  .event-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 0.7rem;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    padding: 4px 12px;
+    margin-bottom: 1.2rem;
+  }
+  .status-active { background: rgba(0,230,118,0.1); color: var(--green); border: 1px solid rgba(0,230,118,0.2); }
+  .status-soon { background: rgba(201,168,76,0.1); color: var(--gold); border: 1px solid rgba(201,168,76,0.2); }
+  .status-done { background: rgba(255,255,255,0.05); color: var(--muted); border: 1px solid rgba(255,255,255,0.1); }
+  .event-card.card-done { opacity: 0.72; }
+  .status-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+  }
+  .status-dot.pulse { animation: dotPulse 1.5s infinite; }
+  .event-num {
+    position: absolute;
+    top: 1.5rem; right: 1.5rem;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 4rem;
+    color: rgba(201,168,76,0.06);
+    line-height: 1;
+  }
+  .event-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.9rem;
+    letter-spacing: 1px;
+    margin-bottom: 0.4rem;
+  }
+  .event-desc { font-size: 0.85rem; color: var(--muted); line-height: 1.6; margin-bottom: 1.2rem; font-weight: 300; }
+  .event-pts-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 600;
+    letter-spacing: 1px;
+    color: var(--gold);
+  }
+  .event-pts-badge::before {
+    content: '';
+    display: block;
+    width: 16px; height: 16px;
+    border: 1.5px solid var(--gold);
+    border-radius: 50%;
+  }
+
+  /* FOOTER */
+  footer {
+    border-top: 1px solid rgba(201,168,76,0.1);
+    padding: 3rem;
+    text-align: center;
+    background: rgba(6,13,31,0.6);
+  }
+  footer .footer-logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2rem;
+    letter-spacing: 5px;
+    color: var(--gold);
+    margin-bottom: 0.8rem;
+  }
+  footer p { font-size: 0.8rem; color: var(--muted); letter-spacing: 1px; }
+
+  /* ANIMATIONS */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  @keyframes scrollPulse {
+    0%, 100% { opacity: 0.3; transform: scaleY(1); transform-origin: top; }
+    50% { opacity: 1; }
+  }
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-6px); }
+  }
+  @keyframes dotPulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(0.7); }
+  }
+  @keyframes revealUp {
+    from { opacity: 0; transform: translateY(40px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .reveal {
+    opacity: 0;
+    transform: translateY(40px);
+    transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+
+  /* GOLD LINE SEPARATOR */
+  .gold-sep {
+    width: 100%;
+    height: 1px;
+    background: linear-gradient(to right, transparent, rgba(201,168,76,0.4), transparent);
+    margin: 5rem 0;
+  }
+
+  @media (max-width: 768px) {
+    nav { padding: 1rem 1.5rem; }
+    .nav-links { display: none; }
+    section { padding: 0 1.5rem 4rem; }
+    .teams-grid { grid-template-columns: repeat(2, 1fr); }
+    .stats-inner { grid-template-columns: repeat(2, 1fr); }
+    .lb-top3 { grid-template-columns: 1fr; }
+    .events-grid { grid-template-columns: 1fr; }
+    .hero-ctas { flex-direction: column; }
+  }
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor">⚽</div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<canvas id="particles"></canvas>
+<div class="stadium-lines"></div>
+
+<div class="content">
+
+  <!-- NAV -->
+  <nav>
+    <div class="nav-logo">CSP · 2026</div>
+    <ul class="nav-links">
+      <li><a href="#equipos">Equipos &amp; Tabla</a></li>
+      <li><a href="#actividades">Actividades</a></li>
+    </ul>
+    <button class="nav-pts-btn" onclick="document.getElementById('ptsModal').classList.add('open')" title="Tabla de puntos">?</button>
+  </nav>
+
+  <!-- MODAL TABLA DE PUNTOS -->
+  <div class="pts-overlay" id="ptsModal" onclick="if(event.target===this)this.classList.remove('open')">
+    <div class="pts-modal">
+      <button class="pts-close" onclick="document.getElementById('ptsModal').classList.remove('open')">✕ CERRAR</button>
+      <div class="pts-title">Tabla de Puntos</div>
+      <div class="pts-sub">Copa Servicios Públicos 2026 · Sistema oficial</div>
+
+      <div class="pts-cat">
+        <div class="pts-cat-title">🔮 Predicciones</div>
+        <div class="pts-row">
+          <span class="pts-icon">🏆</span>
+          <div class="pts-info"><div class="pts-act">Predecir ganador del Mundial</div><div class="pts-obs">Una vez, antes del inicio del torneo</div></div>
+          <div class="pts-val">50 pts</div>
+        </div>
+        <div class="pts-row">
+          <span class="pts-icon">🔮</span>
+          <div class="pts-info"><div class="pts-act">Predecir los 4 semifinalistas</div><div class="pts-obs">Por cada acierto</div></div>
+          <div class="pts-val">20 pts</div>
+        </div>
+        <div class="pts-row">
+          <span class="pts-icon">⚽</span>
+          <div class="pts-info"><div class="pts-act">Predecir ganador de un partido</div><div class="pts-obs">Por partido acertado</div></div>
+          <div class="pts-val">10 pts</div>
+        </div>
+        <div class="pts-row">
+          <span class="pts-icon">🎯</span>
+          <div class="pts-info"><div class="pts-act">Predecir resultado exacto</div><div class="pts-obs">Por marcador exacto acertado</div></div>
+          <div class="pts-val">25 pts</div>
+        </div>
+      </div>
+
+      <div class="pts-cat">
+        <div class="pts-cat-title">🧠 Trivia Mundialista</div>
+        <div class="pts-row">
+          <span class="pts-icon">🔍</span>
+          <div class="pts-info"><div class="pts-act">Encontrar la figura oculta</div><div class="pts-obs">Se esconde una figura — quien la encuentre tiene derecho a responder</div></div>
+          <div class="pts-val">10 pts</div>
+        </div>
+        <div class="pts-row">
+          <span class="pts-icon">✅</span>
+          <div class="pts-info"><div class="pts-act">Responder correctamente la pregunta</div><div class="pts-obs">Bonus si la respuesta es correcta · máximo 20 pts por ronda</div></div>
+          <div class="pts-val">+10 pts</div>
+        </div>
+      </div>
+
+      <div class="pts-cat">
+        <div class="pts-cat-title">🎨 Participación</div>
+        <div class="pts-row">
+          <span class="pts-icon">📸</span>
+          <div class="pts-info"><div class="pts-act">Publicar foto en el Mural</div><div class="pts-obs">Por foto publicada en el mural oficial</div></div>
+          <div class="pts-val">10 pts</div>
+        </div>
+        <div class="pts-row">
+          <span class="pts-icon">🎨</span>
+          <div class="pts-info"><div class="pts-act">Mejor decoración de sección</div><div class="pts-obs">Ganador por votación — Concurso 12 jun</div></div>
+          <div class="pts-val">20 pts</div>
+        </div>
+        <div class="pts-row">
+          <span class="pts-icon">⚽</span>
+          <div class="pts-info"><div class="pts-act">Gol de tu selección en el Mundial</div><div class="pts-obs">Por cada gol real de tu equipo asignado</div></div>
+          <div class="pts-val">5 pts</div>
+        </div>
+      </div>
+
+      <div class="pts-cat">
+        <div class="pts-cat-title">🏟️ Bonus por Avance</div>
+        <div class="pts-row">
+          <span class="pts-icon">🥊</span>
+          <div class="pts-info"><div class="pts-act">Tu selección gana un partido</div><div class="pts-obs">Por cada victoria en el Mundial real</div></div>
+          <div class="pts-val">5 pts</div>
+        </div>
+        <div class="pts-row">
+          <span class="pts-icon">➡️</span>
+          <div class="pts-info"><div class="pts-act">Tu selección avanza de fase</div><div class="pts-obs">Por cada ronda clasificada</div></div>
+          <div class="pts-val">10 pts</div>
+        </div>
+        <div class="pts-row">
+          <span class="pts-icon">🏟️</span>
+          <div class="pts-info"><div class="pts-act">Tu selección llega a semifinales</div><div class="pts-obs">Bonus especial por semifinal</div></div>
+          <div class="pts-val">25 pts</div>
+        </div>
+        <div class="pts-row">
+          <span class="pts-icon">🏆</span>
+          <div class="pts-info"><div class="pts-act">Tu selección es campeona del mundo</div><div class="pts-obs">Bonus máximo — una sola vez</div></div>
+          <div class="pts-val">50 pts</div>
+        </div>
+      </div>
+
+      <div class="pts-cat">
+        <div class="pts-cat-title">⚽ Mini Torneo Mundialista</div>
+        <div class="pts-row">
+          <span class="pts-icon">👟</span>
+          <div class="pts-info"><div class="pts-act">Participar en Ronda 1</div><div class="pts-obs">Por presentarse y jugar el partido</div></div>
+          <div class="pts-val">5 pts</div>
+        </div>
+        <div class="pts-row">
+          <span class="pts-icon">⚔️</span>
+          <div class="pts-info"><div class="pts-act">Clasificar a cuartos de final</div><div class="pts-obs">Bonus acumulado: 15 pts total</div></div>
+          <div class="pts-val">+10 pts</div>
+        </div>
+        <div class="pts-row">
+          <span class="pts-icon">🥊</span>
+          <div class="pts-info"><div class="pts-act">Clasificar a semifinal</div><div class="pts-obs">Bonus acumulado: 25 pts total</div></div>
+          <div class="pts-val">+10 pts</div>
+        </div>
+        <div class="pts-row">
+          <span class="pts-icon">🥈</span>
+          <div class="pts-info"><div class="pts-act">Llegar a la final — Subcampeón</div><div class="pts-obs">Bonus acumulado: 35 pts total</div></div>
+          <div class="pts-val">+10 pts</div>
+        </div>
+        <div class="pts-row">
+          <span class="pts-icon">🏆</span>
+          <div class="pts-info"><div class="pts-act">Ganar el Mini Torneo — Campeón</div><div class="pts-obs">Bonus acumulado: 55 pts total</div></div>
+          <div class="pts-val">+30 pts</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-eyebrow">Subsecretaría de Servicios Públicos · Medellín</div>
+    <h1 class="hero-title">
+      <span class="line1">Copa</span>
+      <span class="line2">Interna</span>
+      <span class="line3">Mundial 2026</span>
+    </h1>
+    <p class="hero-sub">
+      Doce equipos. Doce selecciones. Un campeón.<br>
+      Compite, celebra y vive el mundial desde adentro.
+    </p>
+
+    <div class="countdown" id="countdown">
+      <div class="countdown-item">
+        <div class="countdown-num" id="cd-days">47</div>
+        <div class="countdown-label">Días</div>
+      </div>
+      <div class="countdown-divider"></div>
+      <div class="countdown-item">
+        <div class="countdown-num" id="cd-hours">14</div>
+        <div class="countdown-label">Horas</div>
+      </div>
+      <div class="countdown-divider"></div>
+      <div class="countdown-item">
+        <div class="countdown-num" id="cd-mins">32</div>
+        <div class="countdown-label">Minutos</div>
+      </div>
+      <div class="countdown-divider"></div>
+      <div class="countdown-item">
+        <div class="countdown-num" id="cd-secs">08</div>
+        <div class="countdown-label">Segundos</div>
+      </div>
+    </div>
+
+    <div class="hero-ctas">
+      <button class="btn-primary" onclick="document.getElementById('tabla').scrollIntoView({behavior:'smooth'})"><span>Ver tabla de posiciones</span></button>
+      <button class="btn-secondary" onclick="document.getElementById('actividades').scrollIntoView({behavior:'smooth'})">Ver actividades</button>
+    </div>
+
+    <div class="scroll-hint">
+      <span>Desplazar</span>
+      <div class="scroll-line"></div>
+    </div>
+  </div>
+
+  <!-- STATS BAR -->
+  <div class="stats-bar reveal">
+    <div class="stats-inner">
+      <div class="stat-item">
+        <span class="stat-num" data-target="100" data-prefix="+">0</span>
+        <span class="stat-label">Participantes</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-num" data-target="12">0</span>
+        <span class="stat-label">Grupos</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-num" data-target="7" data-prefix="+">0</span>
+        <span class="stat-label">Actividades</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-num" data-target="5">0</span>
+        <span class="stat-label">Semanas de competencia</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- FLAG RIBBON -->
+  <div class="flag-ribbon-wrap">
+    <div class="flag-ribbon-track" id="flagTrack"></div>
+  </div>
+  <script>
+  (function(){
+    const FLAGS = [
+      {name:"Francia",       src:"data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMCAyMCI+PHBhdGggZmlsbD0iIzAwMjM5NSIgZD0iTTAgMGgxMHYyMEgweiIvPjxwYXRoIGZpbGw9IiNmZmYiIGQ9Ik0xMCAwaDEwdjIwSDEweiIvPjxwYXRoIGZpbGw9IiNlZDI5MzkiIGQ9Ik0yMCAwaDEwdjIwSDIweiIvPjwvc3ZnPg=="},
+      {name:"España",        src:"data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMCAyMCI+PHBhdGggZmlsbD0iI2FhMTUxYiIgZD0iTTAgMGgzMHYyMEgweiIvPjxwYXRoIGZpbGw9IiNmMWJmMDAiIGQ9Ik0wIDVoMzB2MTBIMHoiLz48Y2lyY2xlIGN4PSIxMCIgY3k9IjEwIiByPSIxLjQiIGZpbGw9IiNhYTE1MWIiLz48L3N2Zz4="},
+      {name:"Argentina",     src:"data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMCAyMCI+PHBhdGggZmlsbD0iIzc1YWFkYiIgZD0iTTAgMGgzMHYyMEgweiIvPjxwYXRoIGZpbGw9IiNmZmYiIGQ9Ik0wIDYuNjdoMzB2Ni42NkgweiIvPjxjaXJjbGUgY3g9IjE1IiBjeT0iMTAiIHI9IjEuOCIgZmlsbD0iI2Y2YjQwZSIvPjwvc3ZnPg=="},
+      {name:"Inglaterra",    src:"data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMCAyMCI+PHBhdGggZmlsbD0iI2ZmZiIgZD0iTTAgMGgzMHYyMEgweiIvPjxwYXRoIGZpbGw9IiNjZTExMjQiIGQ9Ik0xMi41IDBoNXYyMGgtNXpNMCA3LjVoMzB2NUgweiIvPjwvc3ZnPg=="},
+      {name:"Portugal",      src:"data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMCAyMCI+PHBhdGggZmlsbD0iIzA0NmEzOCIgZD0iTTAgMGgxMnYyMEgweiIvPjxwYXRoIGZpbGw9IiNkYTI5MWMiIGQ9Ik0xMiAwaDE4djIwSDEyeiIvPjxjaXJjbGUgY3g9IjEyIiBjeT0iMTAiIHI9IjMiIGZpbGw9IiNmZmNkMDAiLz48Y2lyY2xlIGN4PSIxMiIgY3k9IjEwIiByPSIxLjgiIGZpbGw9IiNmZmYiLz48L3N2Zz4="},
+      {name:"Brasil",        src:"data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMCAyMCI+PHBhdGggZmlsbD0iIzAwOWMzYiIgZD0iTTAgMGgzMHYyMEgweiIvPjxwYXRoIGZpbGw9IiNmZmRmMDAiIGQ9Ik0xNSAyLjUgMjcgMTAgMTUgMTcuNSAzIDEweiIvPjxjaXJjbGUgY3g9IjE1IiBjeT0iMTAiIHI9IjQuMiIgZmlsbD0iIzAwMjc3NiIvPjxwYXRoIGQ9Ik0xMS4yIDkuM2MzLS43IDUuNC0uNSA3LjguNyIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZmZmIiBzdHJva2Utd2lkdGg9Ii43Ii8+PC9zdmc+"},
+      {name:"Países Bajos",  src:"data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMCAyMCI+PHBhdGggZmlsbD0iI0FFMUMyOCIgZD0iTTAgMGgzMHY2LjY3SDB6Ii8+PHBhdGggZmlsbD0iI2ZmZiIgZD0iTTAgNi42N2gzMHY2LjY2SDB6Ii8+PHBhdGggZmlsbD0iIzIxNDY4QiIgZD0iTTAgMTMuMzNoMzBWMjBIMHoiLz48L3N2Zz4="},
+      {name:"México",        src:"data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMCAyMCI+PHBhdGggZmlsbD0iIzAwNjg0NyIgZD0iTTAgMGgxMHYyMEgweiIvPjxwYXRoIGZpbGw9IiNmZmYiIGQ9Ik0xMCAwaDEwdjIwSDEweiIvPjxwYXRoIGZpbGw9IiNjZTExMjYiIGQ9Ik0yMCAwaDEwdjIwSDIweiIvPjxjaXJjbGUgY3g9IjE1IiBjeT0iMTAiIHI9IjEuNiIgZmlsbD0iIzliNmIzMCIvPjxwYXRoIGQ9Ik0xMy40IDExLjNxMS42IDEuNCAzLjIgMCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMDA2ODQ3IiBzdHJva2Utd2lkdGg9Ii42Ii8+PC9zdmc+"},
+      {name:"Bélgica",       src:"data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMCAyMCI+PHBhdGggZmlsbD0iIzExMSIgZD0iTTAgMGgxMHYyMEgweiIvPjxwYXRoIGZpbGw9IiNmZmQ5MGMiIGQ9Ik0xMCAwaDEwdjIwSDEweiIvPjxwYXRoIGZpbGw9IiNlZjMzNDAiIGQ9Ik0yMCAwaDEwdjIwSDIweiIvPjwvc3ZnPg=="},
+      {name:"Alemania",      src:"data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMCAyMCI+PHBhdGggZmlsbD0iIzAwMCIgZD0iTTAgMGgzMHY2LjY3SDB6Ii8+PHBhdGggZmlsbD0iI2RkMDAwMCIgZD0iTTAgNi42N2gzMHY2LjY2SDB6Ii8+PHBhdGggZmlsbD0iI2ZmY2UwMCIgZD0iTTAgMTMuMzNoMzBWMjBIMHoiLz48L3N2Zz4="},
+      {name:"Estados Unidos",src:"data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMCAyMCI+PHBhdGggZmlsbD0iI2ZmZiIgZD0iTTAgMGgzMHYyMEgweiIvPjxwYXRoIGZpbGw9IiNiMjIyMzQiIGQ9Ik0wIDBoMzB2MS41NEgwek0wIDMuMDhoMzB2MS41NEgwek0wIDYuMTZoMzBWNy43SDB6TTAgOS4yNGgzMHYxLjU0SDB6TTAgMTIuMzJoMzB2MS41NEgwek0wIDE1LjRoMzB2MS41NEgwek0wIDE4LjQ2aDMwVjIwSDB6Ii8+PHBhdGggZmlsbD0iIzNjM2I2ZSIgZD0iTTAgMGgxMi41djEwLjc4SDB6Ii8+PGcgZmlsbD0iI2ZmZiI+PGNpcmNsZSBjeD0iMiIgY3k9IjIiIHI9Ii40NSIvPjxjaXJjbGUgY3g9IjUiIGN5PSIyIiByPSIuNDUiLz48Y2lyY2xlIGN4PSI4IiBjeT0iMiIgcj0iLjQ1Ii8+PGNpcmNsZSBjeD0iMTEiIGN5PSIyIiByPSIuNDUiLz48Y2lyY2xlIGN4PSIzLjUiIGN5PSI0LjYiIHI9Ii40NSIvPjxjaXJjbGUgY3g9IjYuNSIgY3k9IjQuNiIgcj0iLjQ1Ii8+PGNpcmNsZSBjeD0iOS41IiBjeT0iNC42IiByPSIuNDUiLz48Y2lyY2xlIGN4PSIyIiBjeT0iNy4zIiByPSIuNDUiLz48Y2lyY2xlIGN4PSI1IiBjeT0iNy4zIiByPSIuNDUiLz48Y2lyY2xlIGN4PSI4IiBjeT0iNy4zIiByPSIuNDUiLz48Y2lyY2xlIGN4PSIxMSIgY3k9IjcuMyIgcj0iLjQ1Ii8+PC9nPjwvc3ZnPg=="},
+      {name:"Colombia",      src:"data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMCAyMCI+PHBhdGggZmlsbD0iI2ZjZDExNiIgZD0iTTAgMGgzMHYxMEgweiIvPjxwYXRoIGZpbGw9IiMwMDM4OTMiIGQ9Ik0wIDEwaDMwdjVIMHoiLz48cGF0aCBmaWxsPSIjY2UxMTI2IiBkPSJNMCAxNWgzMHY1SDB6Ii8+PC9zdmc+"}
+    ];
+    const track = document.getElementById('flagTrack');
+    const html = FLAGS.map((f,i) =>
+      `<div class="flag-item"><img class="flag-wave" src="${f.src}" alt="${f.name}"><span class="flag-name">${f.name}</span></div>`
+    ).join('');
+    track.innerHTML = html + html; // doble para loop continuo
+  })();
+  </script>
+
+  <!-- EQUIPOS -->
+  <!-- EQUIPOS + CLASIFICACIÓN (sección unificada) -->
+  <section id="equipos">
+    <div class="reveal">
+      <div class="section-tag">Copa Servicios Públicos 2026</div>
+      <h2 class="section-title">Equipos &amp; Clasificación</h2>
+      <p class="section-sub">12 selecciones · todos parten de cero · la tabla se actualiza con cada actividad</p>
+    </div>
+
+    <!-- PODIO vacío -->
+    <div class="lb-top3 reveal">
+      <div class="podium-card">
+        <div class="podium-medal medal-2">2</div>
+        <div class="podium-slot-empty">🥈</div>
+        <div class="podium-name podium-pending">Por definir</div>
+        <div class="podium-group">—</div>
+        <div class="podium-score podium-pending">—</div>
+        <div class="podium-pts">puntos</div>
+      </div>
+      <div class="podium-card first">
+        <div class="podium-medal medal-1">1</div>
+        <span class="podium-crown">👑</span>
+        <div class="podium-slot-empty">🏆</div>
+        <div class="podium-name podium-pending">Por definir</div>
+        <div class="podium-group">—</div>
+        <div class="podium-score podium-pending">—</div>
+        <div class="podium-pts">puntos</div>
+      </div>
+      <div class="podium-card">
+        <div class="podium-medal medal-3">3</div>
+        <div class="podium-slot-empty">🥉</div>
+        <div class="podium-name podium-pending">Por definir</div>
+        <div class="podium-group">—</div>
+        <div class="podium-score podium-pending">—</div>
+        <div class="podium-pts">puntos</div>
+      </div>
+    </div>
+
+    <!-- TABLA de los 12 equipos -->
+    <div class="lb-rows reveal" id="tabla">
+      <div class="lb-row">
+        <span class="lb-pos">1</span>
+        <span class="lb-flag"><span class="fi fi-es"></span></span>
+        <div class="lb-info"><div class="lb-name">España</div><div class="lb-grp">Equipo 01</div></div>
+        <div class="lb-bar-wrap"><div class="lb-bar-fill" style="width:0%"></div></div>
+        <span class="lb-score-val">0</span>
+      </div>
+      <div class="lb-row">
+        <span class="lb-pos">2</span>
+        <span class="lb-flag"><span class="fi fi-pt"></span></span>
+        <div class="lb-info"><div class="lb-name">Portugal</div><div class="lb-grp">Equipo 02</div></div>
+        <div class="lb-bar-wrap"><div class="lb-bar-fill" style="width:0%"></div></div>
+        <span class="lb-score-val">0</span>
+      </div>
+      <div class="lb-row">
+        <span class="lb-pos">3</span>
+        <span class="lb-flag"><span class="fi fi-br"></span></span>
+        <div class="lb-info"><div class="lb-name">Brasil</div><div class="lb-grp">Equipo 03</div></div>
+        <div class="lb-bar-wrap"><div class="lb-bar-fill" style="width:0%"></div></div>
+        <span class="lb-score-val">0</span>
+      </div>
+      <div class="lb-row">
+        <span class="lb-pos">4</span>
+        <span class="lb-flag"><span class="fi fi-ar"></span></span>
+        <div class="lb-info"><div class="lb-name">Argentina</div><div class="lb-grp">Equipo 04</div></div>
+        <div class="lb-bar-wrap"><div class="lb-bar-fill" style="width:0%"></div></div>
+        <span class="lb-score-val">0</span>
+      </div>
+      <div class="lb-row">
+        <span class="lb-pos">5</span>
+        <span class="lb-flag"><span class="fi fi-nl"></span></span>
+        <div class="lb-info"><div class="lb-name">Países Bajos</div><div class="lb-grp">Equipo 05</div></div>
+        <div class="lb-bar-wrap"><div class="lb-bar-fill" style="width:0%"></div></div>
+        <span class="lb-score-val">0</span>
+      </div>
+      <div class="lb-row">
+        <span class="lb-pos">6</span>
+        <span class="lb-flag"><span class="fi fi-de"></span></span>
+        <div class="lb-info"><div class="lb-name">Alemania</div><div class="lb-grp">Equipo 06</div></div>
+        <div class="lb-bar-wrap"><div class="lb-bar-fill" style="width:0%"></div></div>
+        <span class="lb-score-val">0</span>
+      </div>
+      <div class="lb-row">
+        <span class="lb-pos">7</span>
+        <span class="lb-flag"><span class="fi fi-gb-eng"></span></span>
+        <div class="lb-info"><div class="lb-name">Inglaterra</div><div class="lb-grp">Equipo 07</div></div>
+        <div class="lb-bar-wrap"><div class="lb-bar-fill" style="width:0%"></div></div>
+        <span class="lb-score-val">0</span>
+      </div>
+      <div class="lb-row">
+        <span class="lb-pos">8</span>
+        <span class="lb-flag"><span class="fi fi-mx"></span></span>
+        <div class="lb-info"><div class="lb-name">México</div><div class="lb-grp">Equipo 08</div></div>
+        <div class="lb-bar-wrap"><div class="lb-bar-fill" style="width:0%"></div></div>
+        <span class="lb-score-val">0</span>
+      </div>
+      <div class="lb-row">
+        <span class="lb-pos">9</span>
+        <span class="lb-flag"><span class="fi fi-be"></span></span>
+        <div class="lb-info"><div class="lb-name">Bélgica</div><div class="lb-grp">Equipo 09</div></div>
+        <div class="lb-bar-wrap"><div class="lb-bar-fill" style="width:0%"></div></div>
+        <span class="lb-score-val">0</span>
+      </div>
+      <div class="lb-row">
+        <span class="lb-pos">10</span>
+        <span class="lb-flag"><span class="fi fi-us"></span></span>
+        <div class="lb-info"><div class="lb-name">Estados Unidos</div><div class="lb-grp">Equipo 10</div></div>
+        <div class="lb-bar-wrap"><div class="lb-bar-fill" style="width:0%"></div></div>
+        <span class="lb-score-val">0</span>
+      </div>
+      <div class="lb-row">
+        <span class="lb-pos">11</span>
+        <span class="lb-flag"><span class="fi fi-co"></span></span>
+        <div class="lb-info"><div class="lb-name">Colombia</div><div class="lb-grp">Equipo 11</div></div>
+        <div class="lb-bar-wrap"><div class="lb-bar-fill" style="width:0%"></div></div>
+        <span class="lb-score-val">0</span>
+      </div>
+      <div class="lb-row">
+        <span class="lb-pos">12</span>
+        <span class="lb-flag"><span class="fi fi-fr"></span></span>
+        <div class="lb-info"><div class="lb-name">Francia</div><div class="lb-grp">Equipo 12</div></div>
+        <div class="lb-bar-wrap"><div class="lb-bar-fill" style="width:0%"></div></div>
+        <span class="lb-score-val">0</span>
+      </div>
+    </div>
+  </section>
+
+  <div class="gold-sep"></div>
+
+  <!-- ACTIVIDADES -->
+  <section id="actividades">
+    <div class="reveal">
+      <div class="section-tag">Competencia</div>
+      <h2 class="section-title">Actividades</h2>
+    </div>
+    <div class="events-grid reveal">
+
+      <!-- FILA 1: Polla + Trivia -->
+      <div class="event-card featured">
+        <div class="card-inner">
+          <div class="card-front">
+            <div class="event-num">01</div>
+            <div class="event-status status-active"><span class="status-dot pulse"></span>En curso</div>
+            <div class="event-title">Polla Mundialista</div>
+            <div class="event-desc">Pronostica resultados con la app 365Score. Aporte $50.000 por participante — premiación para los 3 primeros del ranking final.</div>
+            <div class="event-pts-badge">Premio: 70% · 20% · 10% del recaudado</div>
+            <a href="Actividades_Mundial/Polla_mundialista.html" class="card-front-cta" onclick="event.stopPropagation()">Ver Polla →</a>
+            <div class="card-flip-hint">Ver instrucciones →</div>
+          </div>
+          <div class="card-back">
+            <div class="card-back-label">Cómo participar</div>
+            <ul class="card-back-steps">
+              <li>Realiza el aporte de <strong style="color:var(--gold)">$50.000</strong> para inscribirte.</li>
+              <li>Descarga <strong style="color:var(--gold)">365Score</strong> y registra tus pronósticos antes de cada partido.</li>
+              <li>Resultado exacto suma más puntos que solo acertar ganador.</li>
+              <li>Los 3 mejores al final se llevan el 70%, 20% y 10% del recaudo.</li>
+            </ul>
+            <a href="Actividades_Mundial/Polla_mundialista.html" class="card-back-cta" onclick="event.stopPropagation()">Ver detalles →</a>
+            <div class="card-back-hint">← Clic para volver</div>
+          </div>
+        </div>
+      </div>
+      <div class="event-card featured">
+        <div class="card-inner">
+          <div class="card-front">
+            <div class="event-num">02</div>
+            <div class="event-status status-active"><span class="status-dot pulse"></span>En curso</div>
+            <div class="event-title">Trivia Mundialista</div>
+            <div class="event-desc">Preguntas de cultura general del fútbol mundial. Rapidez y precisión marcan la diferencia.</div>
+            <div class="event-pts-badge">Encuentra la figura: +10 pts · Responde bien: +10 pts más</div>
+            <a href="Actividades_Mundial/trivia_mundial_2026.html" class="card-front-cta" onclick="event.stopPropagation()">Jugar Trivia →</a>
+            <div class="card-flip-hint">Ver instrucciones →</div>
+          </div>
+          <div class="card-back">
+            <div class="card-back-label">Cómo participar</div>
+            <ul class="card-back-steps">
+              <li>🔍 Se esconde una figura mundialista — el primero en encontrarla tiene derecho a responder.</li>
+              <li>Solo por encontrarla ya ganas <strong style="color:var(--gold)">+10 pts</strong>.</li>
+              <li>Si además respondes correctamente, sumas <strong style="color:var(--gold)">+10 pts</strong> más.</li>
+              <li>Máximo por ronda: <strong style="color:var(--gold)">20 pts</strong> · puede haber varias rondas.</li>
+            </ul>
+            <a href="Actividades_Mundial/trivia_mundial_2026.html" class="card-back-cta" onclick="event.stopPropagation()">Ir a la Trivia →</a>
+            <div class="card-back-hint">← Clic para volver</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- FILA 2: Mini Torneo (5 jun) + Decoración (12 jun) -->
+      <div class="event-card featured">
+        <div class="card-inner">
+          <div class="card-front">
+            <div class="event-num">03</div>
+            <div class="event-status status-active"><span class="status-dot pulse"></span>En curso</div>
+            <div class="event-title">Mini Torneo de Fútbol</div>
+            <div class="event-desc">12 selecciones, una tarde. Todos juegan Ronda 1, 2 eliminados vuelven al azar, y se disputan cuartos, semis y gran final. 13 partidos, 15 min cada uno.</div>
+            <div class="event-pts-badge">Suma cada ronda que avances · gana hasta +55 pts</div>
+            <a href="Actividades_Mundial/minitorneo_mundial.html" class="card-front-cta" onclick="event.stopPropagation()">Ver Torneo →</a>
+            <div class="card-date">📅 5 jun 2026 · 4:00 – 8:00 pm</div>
+            <div class="card-flip-hint">Ver instrucciones →</div>
+          </div>
+          <div class="card-back">
+            <div class="card-back-label">Cómo participa tu equipo</div>
+            <ul class="card-back-steps">
+              <li>⚽ <strong style="color:var(--gold)">7 jugadores</strong> mínimo · <strong style="color:var(--gold)">2 mujeres</strong> obligatorias.</li>
+              <li>🔁 Todos juegan Ronda 1 → 2 eliminados vuelven al azar → cuartos → semis → final.</li>
+              <li>⏱ Partidos de <strong style="color:var(--gold)">15 min</strong> · 5 jun · 4:00–8:00 pm.</li>
+              <li>📈 Por ronda avanzada: <strong style="color:var(--gold)">+10 pts</strong> · Final ganada: <strong style="color:var(--gold)">+30 pts</strong> · Máximo: <strong style="color:var(--gold)">55 pts</strong>.</li>
+            </ul>
+            <a href="Actividades_Mundial/minitorneo_mundial.html" class="card-back-cta" onclick="event.stopPropagation()">Ver fixture →</a>
+            <div class="card-back-hint">← Clic para volver</div>
+          </div>
+        </div>
+      </div>
+      <div class="event-card featured">
+        <div class="card-inner">
+          <div class="card-front">
+            <div class="event-num">04</div>
+            <div class="event-status status-soon">Próximamente</div>
+            <div class="event-title">Decoración Temática</div>
+            <div class="event-desc">Decora tu cubículo con los colores de tu selección. Jurados sorpresa evalúan creatividad, ambientación y apropiación de la temática.</div>
+            <div class="event-pts-badge">+20 pts al ganador · jurados sorpresa</div>
+            <div class="card-date">📅 12 jun 2026 · 3:00 – 5:00 pm</div>
+            <div class="card-flip-hint">Ver instrucciones →</div>
+          </div>
+          <div class="card-back">
+            <div class="card-back-label">Reglas del concurso</div>
+            <ul class="card-back-steps">
+              <li>Decoración inspirada completamente en el equipo asignado.</li>
+              <li>Cada equipo debe ofrecer un <strong style="color:var(--gold)">compartir</strong> relacionado con la temática.</li>
+              <li>Evaluación a cargo de <strong style="color:var(--gold)">jurados sorpresa</strong>.</li>
+              <li>Se premia creatividad, trabajo colaborativo, ambientación y apropiación.</li>
+            </ul>
+            <div class="card-back-hint">← Clic para volver</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- FILA 3: Futbolín + Mural -->
+      <div class="event-card">
+        <div class="card-inner">
+          <div class="card-front">
+            <div class="event-num">05</div>
+            <div class="event-status status-soon">Próximamente</div>
+            <div class="event-title">Torneo de Futbolín</div>
+            <div class="event-desc">Torneo relámpago de futbolín. Se forman parejas y se juega por eliminación directa hasta coronar al campeón.</div>
+            <div class="event-pts-badge">Puntos al campeón por definir</div>
+            <div class="card-flip-hint">Ver instrucciones →</div>
+          </div>
+          <div class="card-back">
+            <div class="card-back-label">Cómo participar</div>
+            <ul class="card-back-steps">
+              <li>Se forman parejas representando a cada equipo.</li>
+              <li>Eliminación directa al mejor de 3 sets.</li>
+              <li>Fechas y horarios se coordinan por WhatsApp.</li>
+              <li>El equipo campeón recibe <strong style="color:var(--gold)">+40 puntos</strong> para el grupo.</li>
+            </ul>
+            <div class="card-back-hint">← Clic para volver</div>
+          </div>
+        </div>
+      </div>
+      <div class="event-card featured">
+        <div class="card-inner">
+          <div class="card-front">
+            <div class="event-num">06</div>
+            <div class="event-status status-active"><span class="status-dot pulse"></span>En curso</div>
+            <div class="event-title">Mural del Camerino</div>
+            <div class="event-desc">Deja tu huella en el mural oficial de la Copa. Sube tu foto y forma parte de la historia del grupo.</div>
+            <div class="event-pts-badge">+10 pts por foto publicada</div>
+            <a href="Actividades_Mundial/mural_mundial_2026.html" class="card-front-cta" onclick="event.stopPropagation()">Ver Mural →</a>
+            <div class="card-flip-hint">Ver instrucciones →</div>
+          </div>
+          <div class="card-back">
+            <div class="card-back-label">Cómo participar</div>
+            <ul class="card-back-steps">
+              <li>Ingresa al mural y sube tu foto con tu selección asignada.</li>
+              <li>Tu polaroid aparece en el mural junto a los demás participantes.</li>
+              <li>Suma <strong style="color:var(--gold)">+15 puntos</strong> solo por aparecer en el mural.</li>
+              <li>La foto más votada recibe puntos extra al cierre.</li>
+            </ul>
+            <a href="Actividades_Mundial/mural_mundial_2026.html" class="card-back-cta" onclick="event.stopPropagation()">Ir al Mural →</a>
+            <div class="card-back-hint">← Clic para volver</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- FILA 4: Tapazo (realizada) centrado -->
+      <div class="event-card card-solo card-done">
+        <div class="card-inner">
+          <div class="card-front">
+            <div class="event-num">✓</div>
+            <div class="event-status status-done">✔ Realizada</div>
+            <div class="event-title">El Tapazo</div>
+            <div class="event-desc">El evento de lanzamiento donde se revelaron los países que cada equipo representa. El inicio oficial de nuestra competencia.</div>
+            <div class="event-pts-badge">Evento de inauguración</div>
+            <div class="card-date">📅 22 may 2026 · Lico Express</div>
+            <div class="card-flip-hint">Ver detalles →</div>
+          </div>
+          <div class="card-back">
+            <div class="card-back-label">Resumen del evento</div>
+            <ul class="card-back-steps">
+              <li>Cada equipo envió mínimo un representante al evento.</li>
+              <li>Se reveló el país que cada equipo representará en la Copa.</li>
+              <li>Realizado el <strong style="color:var(--gold)">22 de mayo</strong> en Lico Express.</li>
+              <li>Marcó el inicio oficial de la competencia mundialista.</li>
+            </ul>
+            <div class="card-back-hint">← Clic para volver</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-logo">CSP 2026</div>
+    <p>Copa Interna · Subsecretaría de Servicios Públicos · Alcaldía de Medellín</p>
+  </footer>
+
+</div><!-- /content -->
+
+<script>
+// ============================================================
+// CONFIG — reemplaza esta URL con tu Web App de Apps Script
+// ============================================================
+const API_URL = 'https://script.google.com/macros/s/AKfycbz7j0wpPiUPCV0tTRm9XFPMh59I6KDnCH3Bafgr44qkVY2SJ5lEZ9rQgBkhiGk4JO-JNQ/exec';
+
+// ============================================================
+// CURSOR
+// ============================================================
+const cursor = document.getElementById('cursor');
+const ring = document.getElementById('cursorRing');
+let mx = 0, my = 0, rx = 0, ry = 0;
+let lastMx = 0, lastMy = 0, ballAngle = 0, ballScale = 1;
+const trail = [];
+
+document.addEventListener('mousemove', e => {
+  const dx = e.clientX - lastMx, dy = e.clientY - lastMy;
+  ballAngle += Math.sqrt(dx*dx + dy*dy) * 1.5;
+  lastMx = e.clientX; lastMy = e.clientY;
+  mx = e.clientX; my = e.clientY;
+  trail.unshift({x: mx, y: my});
+  if (trail.length > 24) trail.pop();
+});
+
+function animCursor() {
+  cursor.style.left = mx + 'px'; cursor.style.top = my + 'px';
+  cursor.style.transform = `translate(-50%,-50%) rotate(${ballAngle}deg) scale(${ballScale})`;
+  rx += (mx - rx) * 0.12; ry += (my - ry) * 0.12;
+  ring.style.left = rx + 'px'; ring.style.top = ry + 'px';
+  requestAnimationFrame(animCursor);
+}
+animCursor();
+
+function addCursorHover(selector) {
+  document.querySelectorAll(selector).forEach(el => {
+    el.addEventListener('mouseenter', () => { ballScale = 1.6; ring.style.transform = 'translate(-50%,-50%) scale(1.4)'; ring.style.borderColor = 'rgba(201,168,76,0.9)'; });
+    el.addEventListener('mouseleave', () => { ballScale = 1; ring.style.transform = 'translate(-50%,-50%) scale(1)'; ring.style.borderColor = 'rgba(201,168,76,0.5)'; });
+  });
+}
+addCursorHover('button, a, .team-card, .lb-row, .event-card, .podium-card');
+
+// ============================================================
+// PARTICLES
+// ============================================================
+const canvas = document.getElementById('particles');
+const ctx = canvas.getContext('2d');
+let W, H, parts = [];
+function resize() { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
+resize();
+window.addEventListener('resize', resize);
+for (let i = 0; i < 70; i++) {
+  parts.push({ x: Math.random()*W, y: Math.random()*H, r: Math.random()*1.5+0.3, vx:(Math.random()-0.5)*0.3, vy:-Math.random()*0.4-0.1, o:Math.random()*0.5+0.1, gold:Math.random()>0.6 });
+}
+function drawParticles() {
+  ctx.clearRect(0,0,W,H);
+  for (let i = trail.length - 1; i >= 0; i--) {
+    const ratio = 1 - i / trail.length;
+    const r = ratio * 12 + 1;
+    const a = ratio * 0.5;
+    const g = ctx.createRadialGradient(trail[i].x, trail[i].y, 0, trail[i].x, trail[i].y, r);
+    g.addColorStop(0, `rgba(255,220,80,${a})`);
+    g.addColorStop(1, `rgba(201,100,20,0)`);
+    ctx.beginPath(); ctx.arc(trail[i].x, trail[i].y, r, 0, Math.PI*2);
+    ctx.fillStyle = g; ctx.fill();
+  }
+  parts.forEach(p => {
+    ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+    ctx.fillStyle = p.gold ? `rgba(201,168,76,${p.o})` : `rgba(255,255,255,${p.o*0.4})`;
+    ctx.fill();
+    p.x+=p.vx; p.y+=p.vy;
+    if(p.y<-5){p.y=H+5;p.x=Math.random()*W;}
+    if(p.x<-5)p.x=W+5; if(p.x>W+5)p.x=-5;
+  });
+  requestAnimationFrame(drawParticles);
+}
+drawParticles();
+
+// ============================================================
+// COUNTDOWN — Mundial 2026: 11 jun 2026
+// ============================================================
+const worldCupDate = new Date('2026-06-11T18:00:00');
+function updateCountdown() {
+  const diff = worldCupDate - new Date();
+  if (diff <= 0) { document.getElementById('countdown').innerHTML = '<div style="font-family:Bebas Neue,sans-serif;font-size:2rem;color:var(--gold);letter-spacing:3px">¡El Mundial ha comenzado!</div>'; return; }
+  document.getElementById('cd-days').textContent  = String(Math.floor(diff/86400000)).padStart(2,'0');
+  document.getElementById('cd-hours').textContent = String(Math.floor((diff%86400000)/3600000)).padStart(2,'0');
+  document.getElementById('cd-mins').textContent  = String(Math.floor((diff%3600000)/60000)).padStart(2,'0');
+  document.getElementById('cd-secs').textContent  = String(Math.floor((diff%60000)/1000)).padStart(2,'0');
+}
+setInterval(updateCountdown, 1000);
+updateCountdown();
+
+// ============================================================
+// SCROLL REVEAL
+// ============================================================
+const revealObs = new IntersectionObserver((entries) => {
+  entries.forEach((e,i) => { if(e.isIntersecting){ setTimeout(()=>e.target.classList.add('visible'),i*80); revealObs.unobserve(e.target); } });
+}, { threshold: 0.1 });
+document.querySelectorAll('.reveal').forEach(r => revealObs.observe(r));
+
+// ============================================================
+// COUNTER ANIMATION
+// ============================================================
+const counterObs = new IntersectionObserver(entries => {
+  entries.forEach(entry => {
+    if (!entry.isIntersecting) return;
+    const el = entry.target;
+    const end = +el.dataset.target;
+    const prefix = el.dataset.prefix || "";
+    const suffix = el.dataset.suffix || "";
+    let cur = 0; const step = end / 60;
+    const t = setInterval(() => {
+      cur = Math.min(cur+step, end);
+      el.textContent = prefix + Math.floor(cur) + suffix;
+      if (cur >= end) { el.textContent = prefix + end + suffix; clearInterval(t); }
+    }, 20);
+    counterObs.unobserve(el);
+  });
+}, { threshold: 0.5 });
+document.querySelectorAll('.stat-num[data-target]').forEach(c => counterObs.observe(c));
+
+// ============================================================
+// API — cargar datos reales desde Apps Script
+// ============================================================
+async function apiGet(action) {
+  const res = await fetch(`${API_URL}?action=${action}`);
+  return res.json();
+}
+
+const FLAG_FI = {
+  'España':'es','Portugal':'pt','Brasil':'br','Argentina':'ar',
+  'Países Bajos':'nl','Alemania':'de','Inglaterra':'gb-eng',
+  'México':'mx','Bélgica':'be','Estados Unidos':'us','Colombia':'co','Francia':'fr'
+};
+function teamFlagHtml(sel) {
+  const code = FLAG_FI[sel];
+  return code ? `<span class="fi fi-${code}"></span>` : '🏳';
+}
+
+// --- Render tabla de posiciones ---
+async function cargarTabla() {
+  try {
+    const res = await apiGet('scores');
+    if (!res.ok || !res.data || !res.data.length) return;
+
+    const tabla = res.data; // ordenado por total desc desde el script
+
+    // Podio top 3 — solo se muestra si hay al menos un equipo con puntos
+    if (tabla[0] && tabla[0].total > 0) {
+      const podiumCards  = document.querySelectorAll('.lb-top3 .podium-card');
+      const visualOrder  = [tabla[1], tabla[0], tabla[2]];
+      const visualPos    = [2, 1, 3];
+      const medalClasses = ['medal-2', 'medal-1', 'medal-3'];
+
+      podiumCards.forEach((card, vi) => {
+        const g = visualOrder[vi];
+        if (!g) return;
+        const crown = visualPos[vi] === 1 ? '<span class="podium-crown">👑</span>' : '';
+        card.innerHTML = `
+          <div class="podium-medal ${medalClasses[vi]}">${visualPos[vi]}</div>
+          ${crown}
+          <span class="podium-flag">${teamFlagHtml(g.seleccion)}</span>
+          <div class="podium-name">${g.seleccion}</div>
+          <div class="podium-group">${g.equipo}</div>
+          <div class="podium-score">${g.total}</div>
+          <div class="podium-pts">puntos</div>`;
+      });
+    }
+    // Si todos tienen 0, el podio vacío del HTML estático permanece intacto
+
+    // Tabla completa — los 12 equipos
+    const rowsEl = document.getElementById('tabla');
+    if (!rowsEl) return;
+    const maxPts = tabla[0].total || 1;
+    const hayPuntos = tabla[0].total > 0;
+    rowsEl.innerHTML = tabla.map(g => `
+      <div class="lb-row">
+        <span class="lb-pos">${hayPuntos ? g.posicion : '—'}</span>
+        <span class="lb-flag">${teamFlagHtml(g.seleccion)}</span>
+        <div class="lb-info">
+          <div class="lb-name">${g.seleccion}</div>
+          <div class="lb-grp">${g.equipo}</div>
+        </div>
+        <div class="lb-bar-wrap"><div class="lb-bar-fill" style="width:${hayPuntos ? Math.round(g.total / maxPts * 100) : 0}%"></div></div>
+        <span class="lb-score-val">${g.total}</span>
+      </div>`).join('');
+
+  } catch(e) { console.warn('No se pudo cargar la tabla:', e); }
+}
+
+// --- Actividades: tarjetas estáticas en el HTML (no requieren endpoint) ---
+function cargarActividades() { /* tarjetas hardcodeadas en HTML */ }
+
+// --- Dashboard stats: valores fijos (actualizados manualmente) ---
+function cargarDashboard() { /* stats bar usa valores data-target del HTML */ }
+
+// --- Flip cards ---
+document.addEventListener('click', e => {
+  const card = e.target.closest('.events-grid .event-card');
+  if (card) card.classList.toggle('flipped');
+});
+
+// --- Inicializar todo ---
+document.addEventListener('DOMContentLoaded', () => {
+  cargarDashboard();
+  cargarTabla();
+  cargarActividades();
+  // Refrescar cada 60 segundos
+  setInterval(() => { cargarTabla(); cargarActividades(); }, 60000);
+});
+</script>
+</body>
+</html>

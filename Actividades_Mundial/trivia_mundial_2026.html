@@ -1,0 +1,853 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Trivia Mundialista 2026 · Copa Servicios Públicos</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:ital,wght@0,400;0,600;0,700;1,400&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --navy: #060d1f;
+  --navy-mid: #0d1e3a;
+  --navy-light: #162847;
+  --gold: #c9a84c;
+  --gold-light: #f0d080;
+  --gold-dark: #8a6a20;
+  --white: #ffffff;
+  --muted: rgba(255,255,255,0.45);
+  --green: #00e676;
+  --red: #ff4455;
+  --locked: #0a1628;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--navy);
+  color: var(--white);
+  font-family: 'Barlow', sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* CURSOR */
+.cursor { width: 24px; height: 24px; position: fixed; pointer-events: none; z-index: 9999; transform: translate(-50%,-50%); font-size: 20px; transition: transform 0.1s; filter: drop-shadow(0 0 6px rgba(201,168,76,0.8)); }
+.cursor-ring { width: 40px; height: 40px; border: 1.5px solid rgba(201,168,76,0.4); border-radius: 50%; position: fixed; pointer-events: none; z-index: 9998; transform: translate(-50%,-50%); transition: all 0.25s ease; }
+
+/* BG */
+#bgCanvas { position: fixed; inset: 0; z-index: 0; pointer-events: none; opacity: 0.6; }
+.grass-lines {
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background-image: repeating-linear-gradient(90deg, transparent, transparent 60px, rgba(255,255,255,0.012) 60px, rgba(255,255,255,0.012) 61px);
+}
+
+/* HEADER */
+header {
+  position: relative; z-index: 10;
+  padding: 2rem 2rem 1rem;
+  text-align: center;
+  border-bottom: 1px solid rgba(201,168,76,0.15);
+  background: linear-gradient(to bottom, rgba(6,13,31,0.98), rgba(6,13,31,0.8));
+}
+.back-link {
+  position: absolute; left: 2rem; top: 50%;
+  transform: translateY(-50%);
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 0.75rem; letter-spacing: 2px; text-transform: uppercase;
+  color: var(--muted); text-decoration: none;
+  display: flex; align-items: center; gap: 6px;
+  transition: color 0.3s;
+}
+.back-link:hover { color: var(--gold); }
+.header-eyebrow {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 0.7rem; letter-spacing: 5px; text-transform: uppercase;
+  color: var(--gold); margin-bottom: 0.4rem;
+}
+header h1 {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(2.5rem, 6vw, 4.5rem);
+  letter-spacing: 3px; line-height: 1;
+  color: var(--white);
+}
+header h1 span { color: var(--gold); }
+.header-sub { font-size: 0.85rem; color: var(--muted); margin-top: 0.3rem; font-weight: 300; }
+
+/* PROGRESS BAR */
+.progress-wrap {
+  max-width: 700px; margin: 1.2rem auto 0;
+  display: flex; align-items: center; gap: 12px;
+}
+.progress-label { font-family: 'Barlow Condensed', sans-serif; font-size: 0.75rem; letter-spacing: 2px; text-transform: uppercase; color: var(--gold); white-space: nowrap; }
+.progress-bar { flex: 1; height: 4px; background: rgba(255,255,255,0.08); border-radius: 2px; overflow: hidden; }
+.progress-fill { height: 100%; background: linear-gradient(to right, var(--gold-dark), var(--gold)); border-radius: 2px; transition: width 1s ease; }
+.progress-count { font-family: 'Bebas Neue', sans-serif; font-size: 1.2rem; color: var(--gold); white-space: nowrap; }
+
+/* FILTER TABS */
+.filter-wrap {
+  position: relative; z-index: 10;
+  max-width: 1200px; margin: 1.5rem auto 0;
+  padding: 0 1.5rem;
+  display: flex; gap: 8px; flex-wrap: wrap; justify-content: center;
+}
+.filter-btn {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 0.72rem; letter-spacing: 2px; text-transform: uppercase;
+  padding: 6px 16px; border: 1px solid rgba(201,168,76,0.2);
+  background: transparent; color: var(--muted); cursor: pointer;
+  transition: all 0.3s;
+}
+.filter-btn:hover, .filter-btn.active { background: rgba(201,168,76,0.1); border-color: var(--gold); color: var(--gold); }
+
+/* SCORE PANEL */
+.score-panel {
+  position: relative; z-index: 10;
+  max-width: 1200px; margin: 1rem auto;
+  padding: 0 1.5rem;
+  display: flex; justify-content: center; gap: 2rem;
+}
+.score-item { text-align: center; }
+.score-num { font-family: 'Bebas Neue', sans-serif; font-size: 2.2rem; line-height: 1; }
+.score-num.correct { color: var(--green); }
+.score-num.wrong { color: var(--red); }
+.score-num.pending { color: var(--muted); }
+.score-lbl { font-family: 'Barlow Condensed', sans-serif; font-size: 0.65rem; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); }
+
+/* GRID */
+.cards-grid {
+  position: relative; z-index: 5;
+  max-width: 1200px; margin: 0 auto;
+  padding: 1.5rem 1.5rem 4rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+/* CARD FLIP */
+.card-wrap {
+  perspective: 1200px;
+  height: 260px;
+  cursor: pointer;
+}
+.card-wrap.locked { cursor: not-allowed; }
+
+.card-inner {
+  width: 100%; height: 100%;
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.card-wrap.flipped .card-inner { transform: rotateY(180deg); }
+.card-wrap.locked .card-inner { transform: none !important; }
+
+.card-face {
+  position: absolute; inset: 0;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+/* FRONT */
+.card-front {
+  background: var(--navy-mid);
+  border: 1px solid rgba(201,168,76,0.15);
+  padding: 1.5rem;
+  display: flex; flex-direction: column;
+  transition: border-color 0.3s;
+}
+.card-wrap:not(.locked):hover .card-front { border-color: rgba(201,168,76,0.4); }
+.card-front::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(to right, transparent, var(--gold), transparent);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.card-wrap:not(.locked):hover .card-front::before { opacity: 1; }
+
+.card-category {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 0.62rem; letter-spacing: 3px; text-transform: uppercase;
+  color: var(--gold); margin-bottom: 0.6rem;
+  display: flex; align-items: center; gap: 8px;
+}
+.card-category::before { content: ''; display: block; width: 16px; height: 1px; background: var(--gold); }
+
+.card-num {
+  position: absolute; top: 1rem; right: 1.2rem;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 3rem; color: rgba(201,168,76,0.06); line-height: 1;
+}
+.card-question {
+  font-size: 0.95rem; font-weight: 500; line-height: 1.5;
+  flex: 1; color: var(--white);
+}
+.card-options {
+  margin-top: 0.8rem;
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 4px;
+}
+.card-option {
+  font-size: 0.75rem; color: var(--muted);
+  padding: 4px 8px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 2px;
+  font-family: 'Barlow Condensed', sans-serif;
+  letter-spacing: 0.5px;
+  transition: all 0.2s;
+  cursor: pointer;
+}
+.card-option:hover { background: rgba(201,168,76,0.08); border-color: rgba(201,168,76,0.3); color: var(--gold); }
+.card-option.selected-correct { background: rgba(0,230,118,0.12); border-color: rgba(0,230,118,0.5); color: var(--green); }
+.card-option.selected-wrong { background: rgba(255,68,85,0.12); border-color: rgba(255,68,85,0.5); color: var(--red); }
+.card-option.reveal-correct { background: rgba(0,230,118,0.12); border-color: rgba(0,230,118,0.5); color: var(--green); }
+
+.card-hint {
+  margin-top: 0.8rem;
+  font-size: 0.68rem; color: var(--muted);
+  text-align: center; font-style: italic;
+  font-family: 'Barlow Condensed', sans-serif; letter-spacing: 1px;
+}
+.card-text-input { display: flex; flex-direction: column; gap: 6px; margin-top: 0.8rem; }
+.text-answer-input {
+  width: 100%; background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(201,168,76,0.2); border-radius: 2px;
+  color: var(--white); padding: 8px 12px;
+  font-family: 'Barlow', sans-serif; font-size: 0.88rem;
+  outline: none; transition: border-color 0.25s;
+}
+.text-answer-input:focus { border-color: rgba(201,168,76,0.55); }
+.text-answer-input::placeholder { color: rgba(255,255,255,0.18); }
+.text-submit-btn {
+  background: rgba(201,168,76,0.12); border: 1px solid rgba(201,168,76,0.25);
+  color: var(--gold); padding: 7px;
+  font-family: 'Barlow Condensed', sans-serif; font-size: 0.72rem;
+  letter-spacing: 2px; text-transform: uppercase;
+  cursor: pointer; border-radius: 2px; transition: background 0.2s;
+}
+.text-submit-btn:hover { background: rgba(201,168,76,0.22); }
+
+/* BACK */
+.card-back {
+  background: var(--navy-light);
+  border: 1px solid rgba(201,168,76,0.3);
+  padding: 1.5rem;
+  transform: rotateY(180deg);
+  display: flex; flex-direction: column; justify-content: space-between;
+}
+.card-back::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: radial-gradient(circle at top right, rgba(201,168,76,0.07), transparent 60%);
+  pointer-events: none;
+}
+.back-label {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 0.62rem; letter-spacing: 3px; text-transform: uppercase;
+  color: var(--gold);
+}
+.back-answer {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.6rem; letter-spacing: 1px; color: var(--gold-light);
+  line-height: 1.2; margin: 0.5rem 0;
+}
+.back-explanation {
+  font-size: 0.8rem; color: rgba(255,255,255,0.7);
+  line-height: 1.55; font-weight: 300; flex: 1;
+}
+.back-actions {
+  display: flex; gap: 8px; margin-top: 1rem;
+}
+.back-btn {
+  flex: 1; padding: 8px;
+  border: none; border-radius: 2px;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 0.75rem; letter-spacing: 2px; text-transform: uppercase;
+  cursor: pointer; transition: all 0.2s; font-weight: 600;
+}
+.btn-correct { background: rgba(0,230,118,0.15); color: var(--green); border: 1px solid rgba(0,230,118,0.3); }
+.btn-correct:hover { background: rgba(0,230,118,0.25); }
+.btn-wrong { background: rgba(255,68,85,0.15); color: var(--red); border: 1px solid rgba(255,68,85,0.3); }
+.btn-wrong:hover { background: rgba(255,68,85,0.25); }
+
+/* LOCKED CARD */
+.card-locked {
+  background: var(--locked);
+  border: 1px solid rgba(255,255,255,0.05);
+  padding: 1.5rem;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  text-align: center; gap: 0.6rem;
+}
+.lock-icon { font-size: 2rem; opacity: 0.3; }
+.lock-day { font-family: 'Bebas Neue', sans-serif; font-size: 1.1rem; color: rgba(255,255,255,0.15); letter-spacing: 2px; }
+.lock-countdown { font-family: 'Barlow Condensed', sans-serif; font-size: 0.72rem; letter-spacing: 2px; color: rgba(255,255,255,0.12); }
+.lock-num { position: absolute; bottom: 1rem; right: 1.2rem; font-family: 'Bebas Neue', sans-serif; font-size: 2.5rem; color: rgba(255,255,255,0.04); }
+
+/* CELEBRATION OVERLAY */
+.celebration {
+  position: fixed; inset: 0; z-index: 1000;
+  pointer-events: none;
+  display: flex; align-items: center; justify-content: center;
+}
+.celebration-msg {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(4rem, 12vw, 9rem);
+  letter-spacing: 4px;
+  text-align: center;
+  opacity: 0;
+  transform: scale(0.5);
+  transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  pointer-events: none;
+  text-shadow: 0 0 60px currentColor;
+}
+.celebration-msg.correct { color: var(--green); }
+.celebration-msg.wrong { color: var(--red); }
+.celebration-msg.show { opacity: 1; transform: scale(1); }
+.celebration-msg.hide { opacity: 0; transform: scale(1.3); }
+
+/* CONFETTI */
+.confetti-piece {
+  position: fixed;
+  width: 10px; height: 10px;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 999;
+  border-radius: 2px;
+}
+
+/* GOAL ANIMATION */
+@keyframes ballSpin { to { transform: rotate(720deg); } }
+@keyframes goalPulse { 0%,100%{ text-shadow: 0 0 40px rgba(201,168,76,0.9),0 0 80px rgba(201,168,76,0.5); } 50%{ text-shadow: 0 0 80px rgba(240,208,128,1),0 0 160px rgba(201,168,76,0.8); } }
+
+.goal-flash {
+  position: fixed; inset: 0; z-index: 999; pointer-events: none;
+  background: radial-gradient(ellipse at center, rgba(201,168,76,0.22), transparent 65%);
+  opacity: 0; transition: opacity 0.12s;
+}
+.goal-flash.show { opacity: 1; }
+
+.goal-overlay {
+  position: fixed; inset: 0; z-index: 1001; pointer-events: none;
+  display: flex; align-items: center; justify-content: center;
+}
+.goal-text {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(5rem, 20vw, 14rem);
+  letter-spacing: 10px;
+  background: linear-gradient(135deg, #f5e070, #c9a84c, #8a6a20, #f0d080);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  filter: drop-shadow(0 0 30px rgba(201,168,76,0.9));
+  opacity: 0; transform: scale(0.15) rotate(-8deg);
+  transition: opacity 0.25s, transform 0.55s cubic-bezier(0.34,1.56,0.64,1);
+  pointer-events: none; user-select: none;
+}
+.goal-text.show { opacity: 1; transform: scale(1) rotate(0deg); animation: goalPulse 0.6s ease-in-out 0.55s infinite; }
+.goal-text.hide { opacity: 0; transform: scale(1.6) rotate(4deg); animation: none; transition: opacity 0.45s ease, transform 0.45s ease; }
+
+/* EMPTY STATE */
+.empty-state {
+  text-align: center; padding: 4rem 2rem;
+  font-family: 'Barlow Condensed', sans-serif;
+  color: var(--muted); letter-spacing: 1px;
+}
+.empty-state .emoji { font-size: 3rem; margin-bottom: 1rem; }
+
+/* ANSWER STATES on card wrap */
+.card-wrap.answered-correct .card-front { border-color: rgba(0,230,118,0.3); }
+.card-wrap.answered-wrong .card-front { border-color: rgba(255,68,85,0.3); }
+.card-wrap.answered-correct .card-front::after,
+.card-wrap.answered-wrong .card-front::after {
+  content: '';
+  position: absolute; top: 8px; left: 8px;
+  width: 8px; height: 8px; border-radius: 50%;
+}
+.card-wrap.answered-correct .card-front::after { background: var(--green); box-shadow: 0 0 6px var(--green); }
+.card-wrap.answered-wrong .card-front::after { background: var(--red); box-shadow: 0 0 6px var(--red); }
+
+@media (max-width: 600px) {
+  header { padding: 1.2rem 1rem 0.8rem; }
+  .back-link { display: none; }
+  .cards-grid { grid-template-columns: 1fr; padding: 1rem 1rem 4rem; }
+  .score-panel { gap: 1rem; }
+}
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor">⚽</div>
+<div class="cursor-ring" id="cursorRing"></div>
+<canvas id="bgCanvas"></canvas>
+<div class="grass-lines"></div>
+
+<!-- CELEBRATION OVERLAY (solo para incorrectas) -->
+<div class="celebration" id="celebrationWrap">
+  <div class="celebration-msg" id="celebrationMsg"></div>
+</div>
+
+<!-- GOAL ANIMATION -->
+<div class="goal-flash" id="goalFlash"></div>
+<div class="goal-overlay" id="goalOverlay">
+  <div class="goal-text" id="goalText">¡GOOOL!</div>
+</div>
+
+<!-- HEADER -->
+<header>
+  <a href="../index.html" class="back-link">← Volver</a>
+  <div class="header-eyebrow">Copa Servicios Públicos · Mundial 2026</div>
+  <h1>Trivia <span>Mundialista</span></h1>
+  <p class="header-sub">1 tarjeta por día · Desde el 11 de junio</p>
+  <div class="progress-wrap">
+    <span class="progress-label">Progreso</span>
+    <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+    <span class="progress-count" id="progressCount">0/40</span>
+  </div>
+</header>
+
+<!-- SCORE -->
+<div class="score-panel">
+  <div class="score-item">
+    <div class="score-num correct" id="scoreCorrect">0</div>
+    <div class="score-lbl">✓ Correctas</div>
+  </div>
+  <div class="score-item">
+    <div class="score-num wrong" id="scoreWrong">0</div>
+    <div class="score-lbl">✗ Incorrectas</div>
+  </div>
+  <div class="score-item">
+    <div class="score-num pending" id="scorePending">40</div>
+    <div class="score-lbl">⏳ Pendientes</div>
+  </div>
+</div>
+
+<!-- FILTERS -->
+<div class="filter-wrap">
+  <button class="filter-btn active" onclick="filterCards('all', this)">Todas</button>
+  <button class="filter-btn" onclick="filterCards('active', this)">Activas</button>
+  <button class="filter-btn" onclick="filterCards('locked', this)">Bloqueadas</button>
+  <button class="filter-btn" onclick="filterCards('answered', this)">Respondidas</button>
+</div>
+
+<!-- CARDS -->
+<div class="cards-grid" id="cardsGrid"></div>
+
+<script>
+// ─── CURSOR BALÓN ───
+const cursor = document.getElementById('cursor');
+const ring = document.getElementById('cursorRing');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove', e=>{mx=e.clientX;my=e.clientY;});
+(function animC(){
+  cursor.style.left=mx+'px';cursor.style.top=my+'px';
+  rx+=(mx-rx)*0.1;ry+=(my-ry)*0.1;
+  ring.style.left=rx+'px';ring.style.top=ry+'px';
+  requestAnimationFrame(animC);
+})();
+document.addEventListener('mousedown',()=>cursor.style.transform='translate(-50%,-50%) scale(1.4)');
+document.addEventListener('mouseup',()=>cursor.style.transform='translate(-50%,-50%) scale(1)');
+
+// ─── BG PARTICLES ───
+const canvas=document.getElementById('bgCanvas');
+const ctx=canvas.getContext('2d');
+let W,H,pts=[];
+function resize(){W=canvas.width=window.innerWidth;H=canvas.height=window.innerHeight;}
+resize();window.addEventListener('resize',resize);
+for(let i=0;i<50;i++) pts.push({x:Math.random()*W,y:Math.random()*H,r:Math.random()*1.2+0.2,vx:(Math.random()-.5)*.25,vy:-Math.random()*.3-.05,o:Math.random()*.4+.05,g:Math.random()>.5});
+(function drawBg(){
+  ctx.clearRect(0,0,W,H);
+  pts.forEach(p=>{ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fillStyle=p.g?`rgba(201,168,76,${p.o})`:`rgba(255,255,255,${p.o*.3})`;ctx.fill();p.x+=p.vx;p.y+=p.vy;if(p.y<-5){p.y=H+5;p.x=Math.random()*W;}if(p.x<-5)p.x=W+5;if(p.x>W+5)p.x=-5;});
+  requestAnimationFrame(drawBg);
+})();
+
+// ─── DATA ───
+const MUNDIAL_START = new Date('2026-06-11T00:00:00');
+
+const PREGUNTAS = [
+  {id:1,cat:'FORMATO Y SEDE',q:'¿Cuántos equipos participan por primera vez en el Mundial 2026?',opts:['A) 32','B) 40','C) 48','D) 44'],correct:'C',resp:'C) 48',exp:'El Mundial 2026 amplía el torneo a 48 selecciones. Antes eran 32 equipos en Qatar 2022.',demo:true},
+  {id:2,cat:'SEDE',q:'¿En qué estadio se jugará el partido inaugural del Mundial 2026?',type:'text',keywords:['azteca'],resp:'Estadio Azteca',exp:'El partido inaugural entre México y Sudáfrica se disputó el 11 de junio en el Estadio Azteca, Ciudad de México.',demo:true},
+  {id:3,cat:'SEDE',q:'¿En qué estadio se disputará la gran final del Mundial 2026?',opts:['A) Estadio Azteca','B) Rose Bowl','C) Levi\'s Stadium','D) MetLife Stadium'],correct:'D',resp:'D) MetLife Stadium',exp:'La final se jugará el 19 de julio de 2026 en el MetLife Stadium, en Nueva York/Nueva Jersey.'},
+  {id:4,cat:'FORMATO',q:'¿Cuántos grupos tiene la fase de grupos del Mundial 2026?',opts:['A) 8 grupos','B) 10 grupos','C) 12 grupos','D) 16 grupos'],correct:'D',resp:'D) 16 grupos',exp:'Con 48 equipos, el torneo se organiza en 16 grupos de 3 selecciones cada uno.'},
+  {id:5,cat:'SEDE',q:'¿Cuál es el único país sede del Mundial 2026 que ya fue anfitrión en dos ocasiones anteriores?',opts:['A) Estados Unidos','B) Canadá','C) México','D) Ninguno'],correct:'C',resp:'C) México',exp:'México organizó los mundiales de 1970 y 1986. El de 2026 es su tercera edición como sede.'},
+  {id:6,cat:'CLASIFICACIÓN',q:'¿Qué selección fue la primera (fuera de los países sede) en clasificarse al Mundial 2026?',opts:['A) Argentina','B) España','C) Marruecos','D) Japón'],correct:'D',resp:'D) Japón',exp:'Japón fue la primera selección no anfitriona en asegurar su boleto al Mundial 2026.'},
+  {id:7,cat:'DEBUTANTES',q:'¿Cuál de estos países debuta por primera vez en una Copa del Mundo en 2026?',opts:['A) Ghana','B) Ecuador','C) Uzbekistán','D) Australia'],correct:'C',resp:'C) Uzbekistán',exp:'Uzbekistán participa por primera vez en su historia en una Copa del Mundo.'},
+  {id:8,cat:'DEBUTANTES',q:'¿Qué nación caribeña, con apenas ~156.000 habitantes, se convierte en la más pequeña en clasificarse a un Mundial?',opts:['A) Jamaica','B) Surinam','C) Curazao','D) Trinidad y Tobago'],correct:'C',resp:'C) Curazao',exp:'Curazao, territorio autónomo neerlandés, es la nación más pequeña en clasificarse a una Copa del Mundo.'},
+  {id:9,cat:'AFRICA',q:'¿Qué selección africana fue la primera en clasificarse al Mundial 2026, goleando 5-0 a Níger?',opts:['A) Senegal','B) Nigeria','C) Egipto','D) Marruecos'],correct:'D',resp:'D) Marruecos',exp:'Marruecos, semifinalista en Qatar 2022, fue el primer equipo africano en asegurar su boleto.'},
+  {id:10,cat:'AFRICA',q:'¿Cuántas selecciones africanas participarán en el Mundial 2026?',opts:['A) 8 equipos','B) 9 equipos','C) 10 equipos','D) 11 equipos'],correct:'C',resp:'C) 10 equipos',exp:'África alcanza su mayor representación histórica con 10 equipos en el Mundial 2026.'},
+  {id:11,cat:'AFRICA',q:'¿Por qué Camerún perdió su clasificación al Mundial 2026, dándole el paso a Cabo Verde?',opts:['A) Retiro voluntario','B) Sanción por alinear jugador inelegible','C) Violencia en tribunas','D) Problemas económicos'],correct:'B',resp:'B) Sanción por alinear jugador inelegible',exp:'Camerún fue sancionado con derrota 3-0 por alinear un jugador inelegible ante Lesoto, lo que los eliminó.'},
+  {id:12,cat:'AFRICA',q:'¿Qué selección africana regresa al Mundial 2026 con Mohamed Salah como su gran estrella?',opts:['A) Túnez','B) Nigeria','C) Argelia','D) Egipto'],correct:'D',resp:'D) Egipto',exp:'Egipto regresa a la Copa del Mundo con Mohamed Salah, tras ausentarse en Qatar 2022.'},
+  {id:13,cat:'EUROPA',q:'¿Qué selección europea llega como campeona del mundo vigente al Mundial 2026?',opts:['A) Francia','B) Inglaterra','C) Alemania','D) España'],correct:'D',resp:'D) España',exp:'España ganó la Eurocopa 2024 y es la campeona del mundo vigente que llega al Mundial 2026.'},
+  {id:14,cat:'EUROPA',q:'¿Cuáles son los dos excampeones del Mundo europeos que NO clasificaron al Mundial 2026?',opts:['A) Alemania y Bélgica','B) Italia y Croacia','C) Holanda y Dinamarca','D) Suiza y Serbia'],correct:'B',resp:'B) Italia y Croacia',exp:'Italia y Croacia, dos excampeones del Mundo, quedaron fuera de la clasificación europea para 2026.'},
+  {id:15,cat:'EUROPA',q:'¿Cuántas selecciones europeas participan en el Mundial 2026?',opts:['A) 13','B) 14','C) 15','D) 16'],correct:'D',resp:'D) 16',exp:'Europa tendrá 16 selecciones en el Mundial 2026, su mayor contingente histórico.'},
+  {id:16,cat:'EUROPA',q:'Portugal clasificó sin Cristiano Ronaldo en un partido clave. ¿Por qué faltó CR7?',opts:['A) Lesión','B) Suspensión por tarjeta roja ante Irlanda','C) Decisión técnica','D) Retiro internacional'],correct:'B',resp:'B) Suspensión por tarjeta roja ante Irlanda',exp:'CR7 estaba suspendido por roja ante Irlanda cuando Portugal goleó 9-1 a Armenia para clasificar.'},
+  {id:17,cat:'EUROPA',q:'¿Cuántas Copas del Mundo consecutivas disputará Inglaterra al jugar el Mundial 2026?',opts:['A) 6ta consecutiva','B) 7ma consecutiva','C) 8va consecutiva','D) 5ta consecutiva'],correct:'C',resp:'C) 8va consecutiva',exp:'El Mundial 2026 será la octava Copa del Mundo consecutiva para la selección inglesa.'},
+  {id:18,cat:'SUDAMÉRICA',q:'¿Cuántas selecciones sudamericanas clasificaron directamente al Mundial 2026?',opts:['A) 5','B) 6','C) 7','D) 8'],correct:'B',resp:'B) 6',exp:'CONMEBOL clasificó 6 selecciones directamente: Argentina, Brasil, Colombia, Ecuador, Uruguay y Paraguay.'},
+  {id:19,cat:'SUDAMÉRICA',q:'¿Qué selección sudamericana es la única que jamás faltó a ninguna Copa del Mundo en la historia?',opts:['A) Argentina','B) Uruguay','C) Brasil','D) Colombia'],correct:'C',resp:'C) Brasil',exp:'Brasil es el único equipo que ha participado en todos los Mundiales de la historia sin excepción.'},
+  {id:20,cat:'SUDAMÉRICA',q:'¿Con qué resultado Colombia aseguró su clasificación al Mundial 2026?',opts:['A) 3-0 ante Venezuela','B) 3-0 ante Bolivia','C) 2-0 ante Ecuador','D) 1-0 ante Perú'],correct:'B',resp:'B) 3-0 ante Bolivia',exp:'Colombia festejó en Barranquilla su clasificación con una cómoda victoria 3-0 ante Bolivia.'},
+  {id:21,cat:'SUDAMÉRICA',q:'¿Qué resultado le bastó a Ecuador para asegurar su quinta participación en un Mundial?',opts:['A) 1-0 ante Bolivia','B) Empate 0-0 ante Perú','C) 2-1 ante Venezuela','D) 1-1 ante Chile'],correct:'B',resp:'B) Empate 0-0 ante Perú',exp:'Ecuador empató 0-0 ante Perú en Lima y aseguró su quinta participación mundialista.'},
+  {id:22,cat:'SUDAMÉRICA',q:'¿Cuál fue el último Mundial al que asistió Paraguay antes de clasificarse para 2026?',opts:['A) Rusia 2018','B) Brasil 2014','C) Sudáfrica 2010','D) Alemania 2006'],correct:'C',resp:'C) Sudáfrica 2010',exp:'Paraguay clasifica al Mundial 2026 tras una larga ausencia; su último Mundial fue Sudáfrica 2010.'},
+  {id:23,cat:'ASIA',q:'¿Cuántas selecciones asiáticas participan en el Mundial 2026?',opts:['A) 7','B) 8','C) 9','D) 10'],correct:'C',resp:'C) 9',exp:'Asia tiene 9 selecciones en el Mundial 2026, su mayor contingente histórico en una Copa del Mundo.'},
+  {id:24,cat:'ASIA',q:'¿Qué selecciones asiáticas debutan en el Mundial 2026?',opts:['A) Solo Uzbekistán','B) Solo Jordania','C) Uzbekistán y Jordania','D) Kazajistán y Uzbekistán'],correct:'C',resp:'C) Uzbekistán y Jordania',exp:'Tanto Uzbekistán como Jordania debutan en el Mundial 2026, marcando una era dorada del fútbol asiático.'},
+  {id:25,cat:'ASIA',q:'Qatar disputará el Mundial 2026 tras ser anfitrión en 2022. ¿Qué representa esto para el equipo?',opts:['A) Tercer Mundial consecutivo','B) Segunda participación consecutiva','C) Primera clasificación no automática','D) Su debut oficial'],correct:'B',resp:'B) Segunda participación consecutiva',exp:'Qatar logró clasificar al Mundial 2026, lo que significa su segunda participación consecutiva.'},
+  {id:26,cat:'ASIA',q:'¿Cuál es la selección asiática considerada la más fuerte y favorita en el Mundial 2026?',opts:['A) Corea del Sur','B) Irán','C) Australia','D) Japón'],correct:'D',resp:'D) Japón',exp:'Japón es considerada la selección asiática más fuerte con mayores posibilidades de avanzar lejos.'},
+  {id:27,cat:'CONCACAF',q:'¿Cuáles son los tres países coanfitriones del Mundial 2026?',opts:['A) EE.UU., México y Costa Rica','B) EE.UU., México y Canadá','C) EE.UU., Canadá y Jamaica','D) México, Canadá y Guatemala'],correct:'B',resp:'B) EE.UU., México y Canadá',exp:'Estados Unidos, México y Canadá son los tres países coanfitriones, la primera vez histórica con tres sedes.'},
+  {id:28,cat:'REPECHAJE',q:'¿Qué selección fue la última en clasificarse al Mundial 2026, ganando un repechaje intercontinental?',opts:['A) Bolivia','B) Irak','C) Nueva Zelanda','D) Surinam'],correct:'B',resp:'B) Irak',exp:'Irak fue el último clasificado al Mundial 2026, venciendo 2-1 a Bolivia en el repechaje intercontinental.'},
+  {id:29,cat:'REPECHAJE',q:'¿Qué confederación fue la única que NO tuvo cupo de repechaje disponible en 2026?',opts:['A) AFC','B) CONMEBOL','C) OFC','D) UEFA'],correct:'D',resp:'D) UEFA',exp:'Las cinco confederaciones excepto la UEFA tuvieron un cupo adicional de reclasificación en los repechajes.'},
+  {id:30,cat:'OCEANÍA',q:'¿Qué única selección de Oceanía participará en el Mundial 2026?',opts:['A) Fiji','B) Australia','C) Nueva Zelanda','D) Samoa'],correct:'C',resp:'C) Nueva Zelanda',exp:'Nueva Zelanda es el único representante de Oceanía en el Mundial 2026.'},
+  {id:31,cat:'HISTORIA',q:'¿Cuántas participaciones mundialistas acumula Portugal al llegar al Mundial 2026?',opts:['A) 7ma participación','B) 8va participación','C) 9na participación','D) 10ma participación'],correct:'C',resp:'C) 9na participación',exp:'El Mundial 2026 será la novena participación de Portugal en una Copa del Mundo.'},
+  {id:32,cat:'HISTORIA',q:'¿Cuántos títulos mundiales tiene Francia y cuántos busca en el Mundial 2026?',opts:['A) 1 título, busca el 2do','B) 2 títulos, busca el 3ro','C) 1 título, busca el 3ro','D) 3 títulos, busca el 4to'],correct:'B',resp:'B) 2 títulos, busca el 3ro',exp:'Francia tiene 2 títulos (1998 y 2018) y en 2026 irá en busca de su tercer campeonato mundial.'},
+  {id:33,cat:'SELECCIONES',q:'¿Qué selección africana clasificó con Riyad Mahrez y Mohamed Amoura como sus figuras clave?',opts:['A) Marruecos','B) Túnez','C) Argelia','D) Senegal'],correct:'C',resp:'C) Argelia',exp:'Argelia clasificó con Riyad Mahrez y Mohamed Amoura como figuras, tras perderse 2018 y 2022.'},
+  {id:34,cat:'SELECCIONES',q:'¿Cuántos Mundiales consecutivos lleva Senegal clasificando contando 2026?',opts:['A) Segundo consecutivo','B) Tercero consecutivo','C) Cuarto consecutivo','D) Quinto consecutivo'],correct:'B',resp:'B) Tercero consecutivo',exp:'El Mundial 2026 será el tercer torneo consecutivo de Senegal (desde Qatar 2022) y su cuarto en total.'},
+  {id:35,cat:'SELECCIONES',q:'¿Qué selección sudamericana llegará al Mundial 2026 buscando defender su título de campeón del mundo?',opts:['A) Brasil','B) Uruguay','C) Argentina','D) Colombia'],correct:'C',resp:'C) Argentina',exp:'Argentina, campeona del mundo en Qatar 2022, buscará defender la corona, algo que no se logra desde Brasil 1962.'},
+  {id:36,cat:'SELECCIONES',q:'¿Con qué entrenador Brasil aseguró su clasificación al Mundial 2026?',opts:['A) Dorival Junior','B) Tite','C) Carlo Ancelotti','D) Fernando Diniz'],correct:'C',resp:'C) Carlo Ancelotti',exp:'Carlo Ancelotti llegó a Brasil y bajo su dirección el equipo selló la clasificación con victorias clave.'},
+  {id:37,cat:'SELECCIONES',q:'¿Cuántas selecciones debutantes tiene el Mundial 2026?',opts:['A) 2 debutantes','B) 3 debutantes','C) 4 debutantes','D) 5 debutantes'],correct:'C',resp:'C) 4 debutantes',exp:'Los 4 debutantes en el Mundial 2026 son: Cabo Verde, Curazao, Jordania y Uzbekistán.'},
+  {id:38,cat:'FORMATO',q:'¿Cuántos partidos en total se disputarán en el Mundial 2026?',opts:['A) 80 partidos','B) 96 partidos','C) 104 partidos','D) 112 partidos'],correct:'C',resp:'C) 104 partidos',exp:'Con 48 equipos y el nuevo formato de 16 grupos, el Mundial 2026 tendrá 104 partidos en total.'},
+  {id:39,cat:'SELECCIONES',q:'¿Qué selección africana debutante clasificó por primera vez al Mundial 2026 desde el Grupo D?',opts:['A) Ruanda','B) Eswatini','C) Cabo Verde','D) Guinea Ecuatorial'],correct:'C',resp:'C) Cabo Verde',exp:'Cabo Verde debuta en un Mundial al terminar primero en su grupo por delante de Camerún en las eliminatorias africanas.'},
+  {id:40,cat:'SEDE',q:'¿Cuál es la fecha de la gran final del Mundial 2026?',opts:['A) 15 de julio de 2026','B) 17 de julio de 2026','C) 19 de julio de 2026','D) 21 de julio de 2026'],correct:'C',resp:'C) 19 de julio de 2026',exp:'La final del Mundial 2026 está programada para el 19 de julio de 2026 en el MetLife Stadium.'},
+];
+
+// ─── STATE ───
+const state = JSON.parse(localStorage.getItem('triviaState') || '{}');
+// state[id] = 'correct' | 'wrong' | null
+
+function saveState(){ localStorage.setItem('triviaState', JSON.stringify(state)); }
+
+function getDaysSinceMundial(){
+  const now = new Date();
+  const diff = now - MUNDIAL_START;
+  if(diff < 0) return -1;
+  return Math.floor(diff / 86400000);
+}
+
+function isUnlocked(pregId){
+  const p = PREGUNTAS.find(x => x.id === pregId);
+  if(p && p.demo) return true;
+  // Tarjeta N se desbloquea el día N-1 (tarjeta 1 el día 0 = 11 jun)
+  const daysSince = getDaysSinceMundial();
+  if(daysSince < 0) return false;
+  return pregId <= (daysSince + 1);
+}
+
+function countdownToNext(pregId){
+  // Tiempo hasta que se desbloquee esta tarjeta
+  const unlockDate = new Date(MUNDIAL_START.getTime() + (pregId-1) * 86400000);
+  const diff = unlockDate - new Date();
+  if(diff <= 0) return null;
+  const d = Math.floor(diff/86400000);
+  const h = Math.floor((diff%86400000)/3600000);
+  const m = Math.floor((diff%3600000)/60000);
+  if(d > 0) return `En ${d}d ${h}h`;
+  if(h > 0) return `En ${h}h ${m}m`;
+  return `En ${m} min`;
+}
+
+// ─── SCORE ───
+function updateScore(){
+  const answered = Object.keys(state).filter(k=>state[k]).length;
+  const correct = Object.values(state).filter(v=>v==='correct').length;
+  const wrong = Object.values(state).filter(v=>v==='wrong').length;
+  const unlocked = PREGUNTAS.filter(p=>isUnlocked(p.id)).length;
+  const pending = unlocked - answered;
+
+  document.getElementById('scoreCorrect').textContent = correct;
+  document.getElementById('scoreWrong').textContent = wrong;
+  document.getElementById('scorePending').textContent = Math.max(0,pending);
+
+  const pct = answered > 0 ? Math.round(answered/40*100) : 0;
+  document.getElementById('progressFill').style.width = pct+'%';
+  document.getElementById('progressCount').textContent = answered+'/40';
+}
+
+// ─── CELEBRATION ───
+function celebrate(type){
+  if(type === 'correct'){
+    launchGoalAnimation();
+  } else {
+    const wrap = document.getElementById('celebrationWrap');
+    const msg = document.getElementById('celebrationMsg');
+    msg.className = 'celebration-msg wrong';
+    msg.textContent = '¡INCORRECTO! 😢';
+    msg.classList.add('show');
+    setTimeout(()=>{
+      msg.classList.remove('show');
+      msg.classList.add('hide');
+      setTimeout(()=>msg.classList.remove('hide'),400);
+    }, 1800);
+  }
+}
+
+function launchGoalAnimation(){
+  // Flash dorado
+  const flash = document.getElementById('goalFlash');
+  flash.classList.add('show');
+  setTimeout(()=>flash.classList.remove('show'), 350);
+
+  // Texto ¡GOOOL!
+  const text = document.getElementById('goalText');
+  text.classList.remove('hide');
+  text.classList.add('show');
+  setTimeout(()=>{
+    text.classList.remove('show');
+    text.classList.add('hide');
+    setTimeout(()=>text.classList.remove('hide'), 500);
+  }, 2400);
+
+  // Balones voladores
+  for(let i=0; i<12; i++) setTimeout(()=>launchBall(), i*90);
+
+  // Confetti dorado
+  launchConfetti();
+}
+
+function launchBall(){
+  const ball = document.createElement('div');
+  const size = 1.4 + Math.random() * 2.2;
+  const startX = 5 + Math.random() * 90;
+  const duration = 0.9 + Math.random() * 0.8;
+  const delay = Math.random() * 0.3;
+
+  ball.textContent = '⚽';
+  ball.style.cssText = `
+    position:fixed; pointer-events:none; z-index:1000;
+    font-size:${size}rem; line-height:1;
+    left:${startX}vw; top:108vh; opacity:1;
+    transition: top ${duration}s ${delay}s cubic-bezier(0.1,0.8,0.3,1),
+                left ${duration}s ${delay}s ease,
+                opacity 0.5s ${delay + duration * 0.65}s ease;
+    animation: ballSpin ${0.25+Math.random()*0.35}s linear infinite;
+  `;
+  document.body.appendChild(ball);
+
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{
+    ball.style.top = (5 + Math.random() * 72) + 'vh';
+    ball.style.left = (startX + (Math.random()-0.5)*35) + 'vw';
+    ball.style.opacity = '0';
+  }));
+
+  setTimeout(()=>ball.remove(), (delay + duration + 0.7) * 1000);
+}
+
+function launchConfetti(){
+  const colors=['#c9a84c','#f0d080','#00e676','#ffffff','#ffd700'];
+  for(let i=0;i<60;i++){
+    const piece = document.createElement('div');
+    piece.className='confetti-piece';
+    piece.style.cssText=`
+      left:${Math.random()*100}vw;
+      top:-10px;
+      background:${colors[Math.floor(Math.random()*colors.length)]};
+      width:${Math.random()*10+5}px;
+      height:${Math.random()*10+5}px;
+      border-radius:${Math.random()>0.5?'50%':'2px'};
+      transform:rotate(${Math.random()*360}deg);
+      opacity:1;
+      transition:transform ${Math.random()*1.5+1}s ease, top ${Math.random()*1.5+1}s ease, opacity ${Math.random()*.5+1.5}s ease;
+    `;
+    document.body.appendChild(piece);
+    requestAnimationFrame(()=>{
+      piece.style.top=(Math.random()*80+20)+'vh';
+      piece.style.transform=`rotate(${Math.random()*720}deg) translateX(${(Math.random()-0.5)*200}px)`;
+      piece.style.opacity='0';
+    });
+    setTimeout(()=>piece.remove(), 2500);
+  }
+}
+
+// ─── RENDER CARDS ───
+let currentFilter = 'all';
+
+function renderCards(filter='all'){
+  currentFilter = filter;
+  const grid = document.getElementById('cardsGrid');
+  grid.innerHTML = '';
+
+  const toShow = PREGUNTAS.filter(p => {
+    const unlocked = isUnlocked(p.id);
+    const answered = state[p.id];
+    if(filter==='active') return unlocked && !answered;
+    if(filter==='locked') return !unlocked;
+    if(filter==='answered') return !!answered;
+    return true;
+  });
+
+  if(toShow.length===0){
+    grid.innerHTML=`<div class="empty-state" style="grid-column:1/-1"><div class="emoji">⚽</div><p>No hay tarjetas en esta categoría todavía.</p></div>`;
+    return;
+  }
+
+  toShow.forEach((p,i)=>{
+    const unlocked = isUnlocked(p.id);
+    const answered = state[p.id];
+    const countdown = !unlocked ? countdownToNext(p.id) : null;
+
+    const wrap = document.createElement('div');
+    wrap.className = 'card-wrap' + (unlocked?'':' locked') + (answered?' answered-'+answered:'');
+    wrap.dataset.id = p.id;
+    wrap.style.animationDelay = (i*40)+'ms';
+    wrap.style.opacity='0';
+    wrap.style.transform='translateY(20px)';
+    wrap.style.transition='opacity 0.5s ease, transform 0.5s ease';
+
+    if(!unlocked){
+      // LOCKED
+      wrap.innerHTML=`
+        <div class="card-inner">
+          <div class="card-face card-locked">
+            <div class="lock-num">${p.id}</div>
+            <div class="lock-icon">🔒</div>
+            <div class="lock-day">DÍA ${p.id} — ${p.cat}</div>
+            ${countdown?`<div class="lock-countdown">${countdown}</div>`:''}
+          </div>
+        </div>`;
+    } else {
+      // ACTIVE or ANSWERED
+      const demoTag = p.demo ? `<span style="font-size:0.58rem;background:rgba(201,168,76,0.15);border:1px solid rgba(201,168,76,0.3);padding:2px 7px;border-radius:2px;letter-spacing:2px;margin-left:6px;">DEMO</span>` : '';
+      const hintText = answered ? (answered==='correct'?'✓ Respondida correctamente':'✗ Respondida incorrectamente') : (p.type==='text' ? 'Escribe tu respuesta y presiona Enviar' : 'Selecciona una opción o voltea la tarjeta');
+
+      let interactiveHtml;
+      if(p.type === 'text') {
+        if(answered) {
+          interactiveHtml = `<div style="margin-top:0.8rem;font-size:0.82rem;font-family:'Barlow Condensed',sans-serif;letter-spacing:1px;color:${answered==='correct'?'var(--green)':'var(--red)'};">${answered==='correct'?'✓ ¡Correcto! Voltea para ver más.':'✗ Incorrecto — voltea para ver la respuesta.'}</div>`;
+        } else {
+          interactiveHtml = `<div class="card-text-input"><input type="text" class="text-answer-input" id="input-${p.id}" placeholder="Escribe el nombre del estadio…" autocomplete="off" onclick="event.stopPropagation()" onkeydown="if(event.key==='Enter'){event.stopPropagation();checkTextAnswer(${p.id});}"><button class="text-submit-btn" onclick="event.stopPropagation();checkTextAnswer(${p.id})">Enviar →</button></div>`;
+        }
+      } else {
+        const optionsHtml = p.opts.map((o,oi)=>{
+          const letter = ['A','B','C','D'][oi];
+          let cls = 'card-option';
+          if(answered){
+            if(letter===p.correct) cls+=' reveal-correct';
+            else if(answered==='wrong' && state['sel_'+p.id]===letter) cls+=' selected-wrong';
+          }
+          return `<div class="card-option ${cls}" data-letter="${letter}" data-card="${p.id}" onclick="selectOption(event,${p.id},'${letter}')">${o}</div>`;
+        }).join('');
+        interactiveHtml = `<div class="card-options">${optionsHtml}</div>`;
+      }
+
+      const backActions = (p.type === 'text' || answered)
+        ? `<div style="font-size:0.75rem;color:${answered==='correct'?'var(--green)':'var(--red)'};margin-top:0.8rem;font-family:Barlow Condensed,sans-serif;letter-spacing:2px;">${answered==='correct'?'✓ LA TENÍAS':'✗ TE EQUIVOCASTE'}</div>`
+        : `<div class="back-actions">
+            <button class="back-btn btn-correct" onclick="markAnswer(${p.id},'correct')">✓ La tenía</button>
+            <button class="back-btn btn-wrong" onclick="markAnswer(${p.id},'wrong')">✗ Me equivoqué</button>
+          </div>`;
+
+      wrap.innerHTML=`
+        <div class="card-inner">
+          <div class="card-face card-front">
+            <div class="card-num">${p.id}</div>
+            <div class="card-category">${p.cat}${demoTag}</div>
+            <div class="card-question">${p.q}</div>
+            ${interactiveHtml}
+            <div class="card-hint">${hintText}</div>
+          </div>
+          <div class="card-face card-back">
+            <div class="back-label">Respuesta correcta</div>
+            <div class="back-answer">${p.resp}</div>
+            <div class="back-explanation">${p.exp}</div>
+            ${answered ? backActions : (p.type !== 'text' ? `<div class="back-actions">
+              <button class="back-btn btn-correct" onclick="markAnswer(${p.id},'correct')">✓ La tenía</button>
+              <button class="back-btn btn-wrong" onclick="markAnswer(${p.id},'wrong')">✗ Me equivoqué</button>
+            </div>` : '')}
+          </div>
+        </div>`;
+
+      wrap.addEventListener('click', e=>{
+        if(e.target.classList.contains('card-option') || e.target.classList.contains('back-btn') || e.target.classList.contains('text-answer-input') || e.target.classList.contains('text-submit-btn')) return;
+        wrap.classList.toggle('flipped');
+      });
+    }
+
+    grid.appendChild(wrap);
+    requestAnimationFrame(()=>{
+      setTimeout(()=>{wrap.style.opacity='1';wrap.style.transform='translateY(0)';}, i*40);
+    });
+  });
+}
+
+function selectOption(e, cardId, letter){
+  e.stopPropagation();
+  if(state[cardId]) return; // ya respondida
+
+  const p = PREGUNTAS.find(x=>x.id===cardId);
+  const isCorrect = letter === p.correct;
+  const result = isCorrect ? 'correct' : 'wrong';
+
+  state[cardId] = result;
+  state['sel_'+cardId] = letter;
+  saveState();
+  celebrate(result);
+
+  // Re-render la tarjeta
+  const wrap = document.querySelector(`.card-wrap[data-id="${cardId}"]`);
+  if(wrap){
+    wrap.classList.add('answered-'+result);
+    // actualizar opciones
+    wrap.querySelectorAll('.card-option').forEach(opt=>{
+      const l = opt.dataset.letter;
+      if(l===p.correct) opt.classList.add('reveal-correct');
+      else if(l===letter && !isCorrect) opt.classList.add('selected-wrong');
+    });
+    wrap.querySelector('.card-hint').textContent = isCorrect ? '✓ Respondida correctamente' : '✗ Respondida incorrectamente';
+  }
+  updateScore();
+}
+
+function markAnswer(cardId, result){
+  if(state[cardId]) return;
+  state[cardId] = result;
+  saveState();
+  celebrate(result);
+  renderCards(currentFilter);
+  updateScore();
+}
+
+function checkTextAnswer(cardId){
+  if(state[cardId]) return;
+  const p = PREGUNTAS.find(x => x.id === cardId);
+  const input = document.getElementById('input-' + cardId);
+  if(!input || !input.value.trim()) return;
+
+  const userVal = input.value.trim().toLowerCase();
+  const isCorrect = (p.keywords || []).some(kw => userVal.includes(kw.toLowerCase()));
+  const result = isCorrect ? 'correct' : 'wrong';
+
+  state[cardId] = result;
+  state['sel_' + cardId] = input.value.trim();
+  saveState();
+  celebrate(result);
+
+  const wrap = document.querySelector(`.card-wrap[data-id="${cardId}"]`);
+  if(wrap){
+    wrap.classList.add('answered-' + result);
+    const textInputEl = wrap.querySelector('.card-text-input');
+    if(textInputEl) textInputEl.innerHTML = `<div style="margin-top:0.4rem;font-size:0.82rem;font-family:'Barlow Condensed',sans-serif;letter-spacing:1px;color:${isCorrect?'var(--green)':'var(--red)'};">${isCorrect?'✓ ¡Correcto! Voltea para ver más.':'✗ Incorrecto — voltea para ver la respuesta.'}</div>`;
+    const hint = wrap.querySelector('.card-hint');
+    if(hint) hint.textContent = isCorrect ? '✓ Respondida correctamente' : '✗ Respondida incorrectamente';
+  }
+  updateScore();
+}
+
+function filterCards(filter, btn){
+  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderCards(filter);
+}
+
+// ─── INIT ───
+// Restaurar demo cards en cada carga para permitir pruebas repetidas
+PREGUNTAS.filter(p => p.demo).forEach(p => {
+  delete state[p.id];
+  delete state['sel_' + p.id];
+});
+saveState();
+
+renderCards('all');
+updateScore();
+
+// Auto-refresh cada minuto (por si cambia el día)
+setInterval(()=>{ renderCards(currentFilter); updateScore(); }, 60000);
+</script>
+</body>
+</html>

@@ -1,0 +1,16 @@
+# Sistema
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Archivos de trabajo local (no se despliegan)
+*.xlsx
+*.gs
+memory/
+
+# HTML original reemplazado por index.html
+copa_servicios_2026_FINAL.html
+
+# Temporales
+*.tmp
+*.log

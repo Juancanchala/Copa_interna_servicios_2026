@@ -1,0 +1,7 @@
+[build]
+  publish = "."
+
+[[redirects]]
+  from = "/copa_servicios_2026_FINAL.html"
+  to   = "/index.html"
+  status = 301

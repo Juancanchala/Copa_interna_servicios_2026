@@ -1,0 +1,1269 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Mural del Camerino · Copa Servicios Públicos 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@400;600;700&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --navy: #060d1f;
+  --navy-mid: #0d1e3a;
+  --navy-light: #162847;
+  --gold: #c9a84c;
+  --gold-light: #f0d080;
+  --white: #ffffff;
+  --muted: rgba(255,255,255,0.45);
+  --green: #00e676;
+  --red: #ff4455;
+  --panel: #0a1628;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;overflow-x:hidden;}
+body{background:var(--navy);color:var(--white);font-family:'Barlow',sans-serif;}
+
+/* ── CURSOR ── */
+.cursor{width:24px;height:24px;position:fixed;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);font-size:20px;filter:drop-shadow(0 0 6px rgba(201,168,76,0.8));transition:transform .1s;}
+.cursor-ring{width:40px;height:40px;border:1.5px solid rgba(201,168,76,0.35);border-radius:50%;position:fixed;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:all .25s ease;}
+
+/* ── HEADER ── */
+header{position:sticky;top:0;z-index:200;background:rgba(6,13,31,0.97);backdrop-filter:blur(12px);border-bottom:1px solid rgba(201,168,76,0.12);padding:.9rem 1.5rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;}
+.logo{font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:3px;color:var(--gold);}
+.logo span{color:var(--white);}
+.header-tabs{display:flex;gap:4px;}
+.tab-btn{font-family:'Barlow Condensed',sans-serif;font-size:.72rem;letter-spacing:2px;text-transform:uppercase;padding:7px 18px;border:1px solid rgba(201,168,76,0.2);background:transparent;color:var(--muted);cursor:pointer;transition:all .25s;}
+.tab-btn.active,.tab-btn:hover{background:rgba(201,168,76,0.12);border-color:var(--gold);color:var(--gold);}
+.back-btn{font-family:'Barlow Condensed',sans-serif;font-size:.7rem;letter-spacing:2px;text-transform:uppercase;color:var(--muted);text-decoration:none;transition:color .3s;}
+.back-btn:hover{color:var(--gold);}
+
+/* ── VIEWS ── */
+.view{display:none;min-height:calc(100vh - 60px);}
+.view.active{display:block;}
+
+/* ═══════════════════════════════
+   MURAL VIEW
+═══════════════════════════════ */
+.mural-hero{text-align:center;padding:3rem 1.5rem 2rem;position:relative;}
+.mural-hero h1{font-family:'Bebas Neue',sans-serif;font-size:clamp(3rem,8vw,6rem);letter-spacing:3px;line-height:1;}
+.mural-hero h1 span{color:var(--gold);}
+.mural-hero p{color:var(--muted);font-size:.9rem;margin-top:.5rem;font-weight:300;}
+.mural-stats{display:flex;justify-content:center;gap:2rem;margin:1.5rem 0;}
+.mstat{text-align:center;}
+.mstat-n{font-family:'Bebas Neue',sans-serif;font-size:2.2rem;color:var(--gold);line-height:1;}
+.mstat-l{font-family:'Barlow Condensed',sans-serif;font-size:.65rem;letter-spacing:2px;text-transform:uppercase;color:var(--muted);}
+
+/* TEAM FILTER */
+.team-filter{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;padding:0 1.5rem 1.5rem;}
+.tf-btn{font-family:'Barlow Condensed',sans-serif;font-size:.7rem;letter-spacing:1.5px;text-transform:uppercase;padding:5px 14px;border:1px solid rgba(255,255,255,0.1);background:transparent;color:var(--muted);cursor:pointer;border-radius:2px;transition:all .25s;display:flex;align-items:center;gap:6px;}
+.tf-btn:hover,.tf-btn.active{border-color:var(--gold);color:var(--gold);background:rgba(201,168,76,0.08);}
+.tf-dl{font-size:.85rem;opacity:0;margin-left:2px;transition:opacity .2s;line-height:1;}
+.tf-btn:hover .tf-dl,.tf-btn.active .tf-dl{opacity:.7;}
+.tf-dl:hover{opacity:1 !important;}
+
+/* POLAROID WALL — secciones por equipo */
+.polaroid-wall{
+  max-width:1200px; margin:0 auto;
+  padding:2rem 2rem 5rem;
+  display:flex; flex-direction:column; gap:3.5rem;
+}
+
+/* SECCIÓN DE EQUIPO */
+.team-section{ width:100%; }
+.team-section-header{
+  display:flex; align-items:center; gap:10px;
+  padding-bottom:.75rem;
+  border-bottom:1px solid rgba(201,168,76,0.12);
+  margin-bottom:2rem;
+}
+.tsh-flag{ font-size:1.5rem; line-height:1; }
+.tsh-name{ font-family:'Bebas Neue',sans-serif; font-size:1.3rem; letter-spacing:3px; color:var(--white); }
+.tsh-count{ font-family:'Barlow Condensed',sans-serif; font-size:.68rem; letter-spacing:2px; color:var(--muted); margin-left:auto; }
+.tsh-bar{ width:60px; height:2px; background:rgba(255,255,255,0.07); border-radius:2px; overflow:hidden; }
+.tsh-fill{ height:100%; background:var(--gold); transition:width .6s ease; }
+.tsh-dl{margin-left:10px;background:rgba(212,175,55,0.1);border:1px solid rgba(212,175,55,0.3);color:var(--gold);padding:3px 10px;font-family:'Barlow Condensed',sans-serif;font-size:.62rem;letter-spacing:2px;text-transform:uppercase;cursor:pointer;border-radius:2px;transition:all .2s;white-space:nowrap;}
+.tsh-dl:hover{background:rgba(212,175,55,0.25);}
+
+/* DRAG & DROP */
+.polaroid{cursor:grab;}
+.polaroid:active{cursor:grabbing;}
+.pol-dragging{opacity:.3;cursor:grabbing;}
+.pol-drag-over{outline:2px solid var(--gold);outline-offset:3px;box-shadow:0 0 18px rgba(212,175,55,0.5),0 20px 40px rgba(0,0,0,0.6)!important;}
+
+/* FAN DE FOTOS */
+.photo-fan{
+  position:relative; height:290px;
+  overflow:visible;
+}
+.photo-fan .polaroid{
+  position:absolute; width:155px;
+  break-inside:unset; margin-bottom:0;
+  transition:transform .35s cubic-bezier(.34,1.56,.64,1), box-shadow .3s, z-index 0s;
+}
+.photo-fan .polaroid:hover{
+  transform:rotate(0deg) scale(1.12) translateY(-12px) !important;
+  box-shadow:0 20px 50px rgba(0,0,0,0.8), 0 0 0 2px var(--gold) !important;
+  z-index:20 !important;
+}
+
+/* Polaroid base */
+.polaroid{background:#fefcf6;padding:8px 8px 36px;box-shadow:0 6px 28px rgba(0,0,0,0.55);cursor:pointer;position:relative;display:block;}
+.polaroid img{width:100%;aspect-ratio:1;object-fit:cover;display:block;}
+.polaroid .pol-canvas{width:100%;aspect-ratio:1;position:relative;overflow:hidden;background:#1a1a2e;}
+.polaroid .pol-note{position:absolute;bottom:4px;left:0;right:0;text-align:center;font-family:'Barlow Condensed',sans-serif;font-size:.68rem;color:#444;letter-spacing:.5px;padding:0 5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.polaroid .pol-team{position:absolute;top:4px;right:5px;font-size:.9rem;}
+
+/* Cinta adhesiva */
+.pol-taped::before{content:'';position:absolute;top:-10px;left:50%;transform:translateX(-50%) rotate(-2deg);width:48px;height:18px;background:rgba(255,242,160,0.58);box-shadow:0 1px 4px rgba(0,0,0,0.25);z-index:3;pointer-events:none;}
+.pol-taped-r::before{content:'';position:absolute;top:-10px;left:50%;transform:translateX(-50%) rotate(4deg);width:44px;height:17px;background:rgba(255,242,160,0.5);box-shadow:0 1px 4px rgba(0,0,0,0.2);z-index:3;pointer-events:none;}
+
+/* Pin */
+.pol-pinned{ padding-top:16px; }
+.pol-pinned::before{content:'';position:absolute;top:-6px;left:50%;transform:translateX(-50%);width:13px;height:13px;background:radial-gradient(circle at 35% 30%,#ff8a80,#b71c1c);border-radius:50%;box-shadow:0 3px 8px rgba(0,0,0,0.6),inset 0 1px 2px rgba(255,255,255,0.35);z-index:3;pointer-events:none;}
+
+/* Slot vacío */
+.pol-empty{
+  position:absolute; width:155px; height:204px;
+  background:rgba(255,255,255,0.015);
+  border:1px dashed rgba(255,255,255,0.06);
+  display:flex; flex-direction:column;
+  align-items:center; justify-content:center; gap:5px;
+  cursor:pointer; transition:border-color .3s;
+}
+.pol-empty:hover{ border-color:rgba(201,168,76,0.22); }
+.pe-flag{ font-size:1.1rem; opacity:.14; }
+.pe-label{ font-family:'Barlow Condensed',sans-serif; font-size:.55rem; letter-spacing:2px; text-transform:uppercase; color:rgba(255,255,255,0.1); }
+
+@media(max-width:600px){
+  .photo-fan{ overflow-x:auto; min-width:0; }
+}
+
+/* EMPTY MURAL */
+.empty-mural{text-align:center;padding:5rem 2rem;color:var(--muted);}
+.empty-mural .big{font-size:4rem;margin-bottom:1rem;}
+
+/* ═══════════════════════════════
+   EDITOR VIEW
+═══════════════════════════════ */
+.editor-wrap{max-width:1100px;margin:0 auto;padding:1.5rem;display:grid;grid-template-columns:1fr 300px;gap:1.5rem;align-items:start;}
+@media(max-width:800px){.editor-wrap{grid-template-columns:1fr;}}
+
+/* CANVAS AREA */
+.canvas-container{position:relative;background:var(--panel);border:1px solid rgba(201,168,76,0.15);border-radius:2px;overflow:hidden;}
+.canvas-header{padding:.8rem 1rem;border-bottom:1px solid rgba(201,168,76,0.1);display:flex;align-items:center;justify-content:space-between;}
+.canvas-header h3{font-family:'Barlow Condensed',sans-serif;font-size:.8rem;letter-spacing:3px;text-transform:uppercase;color:var(--gold);}
+.canvas-actions{display:flex;gap:6px;}
+.icon-btn{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:var(--muted);padding:5px 10px;font-size:.75rem;cursor:pointer;transition:all .2s;font-family:'Barlow Condensed',sans-serif;letter-spacing:1px;}
+.icon-btn:hover{background:rgba(201,168,76,0.1);border-color:var(--gold);color:var(--gold);}
+
+#mainCanvas{display:block;width:100%;cursor:crosshair;touch-action:none;}
+
+/* Upload zone */
+.upload-zone{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1rem;background:var(--panel);transition:all .3s;cursor:pointer;}
+.upload-zone.hidden{display:none;}
+.upload-zone:hover{background:rgba(13,30,58,0.95);}
+.upload-icon{font-size:3.5rem;animation:float 3s ease-in-out infinite;}
+.upload-title{font-family:'Bebas Neue',sans-serif;font-size:1.8rem;letter-spacing:2px;color:var(--gold);}
+.upload-sub{font-size:.82rem;color:var(--muted);text-align:center;line-height:1.6;}
+.upload-dashed{border:2px dashed rgba(201,168,76,0.3);padding:2rem 3rem;border-radius:4px;text-align:center;transition:border-color .3s;}
+.upload-dashed:hover{border-color:var(--gold);}
+#fileInput{display:none;}
+
+/* TOOLS PANEL */
+.tools-panel{display:flex;flex-direction:column;gap:12px;}
+.tool-section{background:var(--panel);border:1px solid rgba(201,168,76,0.1);padding:1rem;}
+.tool-title{font-family:'Barlow Condensed',sans-serif;font-size:.68rem;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:.8rem;display:flex;align-items:center;gap:8px;}
+.tool-title::before{content:'';display:block;width:12px;height:1px;background:var(--gold);}
+
+/* TEAM SELECT */
+.team-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:5px;}
+.team-pick{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);padding:6px 4px;text-align:center;cursor:pointer;font-size:1.3rem;border-radius:2px;transition:all .2s;position:relative;}
+.team-pick:hover,.team-pick.selected{border-color:var(--gold);background:rgba(201,168,76,0.1);}
+.team-pick .tcount{position:absolute;top:2px;right:3px;font-size:.45rem;font-family:'Bebas Neue',sans-serif;color:var(--muted);}
+.team-pick.full{opacity:.4;cursor:not-allowed;}
+.team-pick.full:hover{border-color:rgba(255,255,255,0.06);background:rgba(255,255,255,0.03);}
+
+/* FILTERS */
+.filter-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;}
+.filter-pick{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);padding:8px 4px;text-align:center;font-family:'Barlow Condensed',sans-serif;font-size:.62rem;letter-spacing:1px;text-transform:uppercase;color:var(--muted);cursor:pointer;border-radius:2px;transition:all .2s;}
+.filter-pick:hover,.filter-pick.active{border-color:var(--gold);color:var(--gold);background:rgba(201,168,76,0.08);}
+
+/* FRAMES */
+.frame-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:5px;}
+.frame-pick{aspect-ratio:1;border:3px solid transparent;cursor:pointer;border-radius:2px;transition:all .2s;position:relative;overflow:hidden;}
+.frame-pick:hover,.frame-pick.active{transform:scale(1.1);}
+.frame-pick.active::after{content:'✓';position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.4);font-size:.8rem;color:#fff;}
+
+/* STICKERS */
+.sticker-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:4px;max-height:140px;overflow-y:auto;}
+.sticker-btn{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.06);padding:6px;text-align:center;font-size:1.4rem;cursor:pointer;border-radius:2px;transition:all .2s;}
+.sticker-btn:hover{background:rgba(201,168,76,0.1);border-color:var(--gold);transform:scale(1.15);}
+
+/* TEXT TOOL */
+.text-input-wrap{display:flex;flex-direction:column;gap:6px;}
+.text-input-wrap input,.text-input-wrap select{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:var(--white);padding:7px 10px;font-family:'Barlow',sans-serif;font-size:.82rem;outline:none;transition:border-color .2s;width:100%;}
+.text-input-wrap input:focus,.text-input-wrap select:focus{border-color:var(--gold);}
+.text-input-wrap select option{background:var(--navy-mid);}
+.color-row{display:flex;gap:5px;flex-wrap:wrap;}
+.color-dot{width:22px;height:22px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:all .2s;}
+.color-dot:hover,.color-dot.active{border-color:var(--white);transform:scale(1.15);}
+.add-text-btn{background:rgba(201,168,76,0.15);border:1px solid rgba(201,168,76,0.4);color:var(--gold);padding:7px;font-family:'Barlow Condensed',sans-serif;font-size:.72rem;letter-spacing:2px;text-transform:uppercase;cursor:pointer;transition:all .2s;width:100%;}
+.add-text-btn:hover{background:rgba(201,168,76,0.25);}
+
+/* SLIDER */
+.slider-wrap{display:flex;align-items:center;gap:8px;}
+.slider-wrap input[type=range]{flex:1;-webkit-appearance:none;height:3px;background:rgba(255,255,255,0.1);border-radius:2px;outline:none;}
+.slider-wrap input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:var(--gold);cursor:pointer;}
+.slider-val{font-family:'Bebas Neue',sans-serif;font-size:.9rem;color:var(--gold);min-width:24px;text-align:right;}
+
+/* PUBLISH BTN */
+.publish-btn{background:var(--gold);color:var(--navy);font-family:'Bebas Neue',sans-serif;font-size:1.3rem;letter-spacing:3px;padding:1rem;border:none;cursor:pointer;width:100%;transition:all .3s;position:relative;overflow:hidden;}
+.publish-btn::before{content:'';position:absolute;inset:0;background:var(--white);transform:translateX(-100%);transition:transform .3s;}
+.publish-btn:hover::before{transform:translateX(0);}
+.publish-btn span{position:relative;z-index:1;}
+.publish-btn:disabled{opacity:.4;cursor:not-allowed;}
+
+/* NOTE INPUT */
+.note-input{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:var(--white);padding:7px 10px;font-family:'Barlow',sans-serif;font-size:.82rem;outline:none;width:100%;resize:none;height:60px;}
+.note-input:focus{border-color:var(--gold);}
+
+/* OBJECT CONTROLS */
+.obj-controls{display:flex;gap:5px;flex-wrap:wrap;margin-top:6px;}
+.obj-btn{flex:1;min-width:60px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);color:var(--muted);padding:5px;font-family:'Barlow Condensed',sans-serif;font-size:.65rem;letter-spacing:1px;text-transform:uppercase;cursor:pointer;transition:all .2s;}
+.obj-btn:hover{border-color:var(--gold);color:var(--gold);}
+.obj-btn.danger:hover{border-color:var(--red);color:var(--red);}
+
+/* STATUS */
+.status-bar{background:rgba(0,230,118,0.08);border:1px solid rgba(0,230,118,0.2);padding:.6rem 1rem;margin-bottom:.8rem;font-family:'Barlow Condensed',sans-serif;font-size:.72rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--green);display:none;}
+.status-bar.show{display:block;}
+.status-bar.error{background:rgba(255,68,85,0.08);border-color:rgba(255,68,85,0.2);color:var(--red);}
+
+/* ANIMATIONS */
+@keyframes float{0%,100%{transform:translateY(0);}50%{transform:translateY(-8px);}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
+.fade-up{animation:fadeUp .5s ease forwards;}
+
+/* LIGHTBOX */
+.lightbox{position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:500;display:none;align-items:center;justify-content:center;padding:2rem;}
+.lightbox.open{display:flex;}
+.lightbox-inner{max-width:600px;width:100%;position:relative;}
+.lightbox img{width:100%;display:block;box-shadow:0 20px 60px rgba(0,0,0,0.8);}
+.lightbox-close{position:absolute;top:-2rem;right:0;background:none;border:none;color:var(--muted);font-size:1.5rem;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:2px;}
+.lightbox-close:hover{color:var(--white);}
+.lightbox-info{background:rgba(13,30,58,0.95);padding:.8rem 1rem;font-family:'Barlow Condensed',sans-serif;display:flex;align-items:center;justify-content:space-between;gap:1rem;}
+.lightbox-info .li-team{font-size:1.5rem;}
+.lightbox-info .li-note{font-size:.85rem;color:var(--muted);letter-spacing:.5px;flex:1;}
+.lightbox-delete{background:rgba(255,68,85,0.12);border:1px solid rgba(255,68,85,0.3);color:var(--red);padding:6px 14px;font-family:'Barlow Condensed',sans-serif;font-size:.7rem;letter-spacing:2px;text-transform:uppercase;cursor:pointer;transition:all .2s;white-space:nowrap;}
+.lightbox-delete:hover{background:rgba(255,68,85,0.25);}
+.lightbox-download{background:rgba(212,175,55,0.12);border:1px solid rgba(212,175,55,0.3);color:var(--gold);padding:6px 14px;font-family:'Barlow Condensed',sans-serif;font-size:.7rem;letter-spacing:2px;text-transform:uppercase;cursor:pointer;transition:all .2s;white-space:nowrap;}
+.lightbox-download:hover{background:rgba(212,175,55,0.25);}
+
+/* TOAST */
+.toast{position:fixed;bottom:2rem;left:50%;transform:translateX(-50%) translateY(100px);background:var(--gold);color:var(--navy);font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:2px;padding:.7rem 2rem;z-index:600;transition:transform .4s cubic-bezier(.34,1.56,.64,1);pointer-events:none;}
+.toast.show{transform:translateX(-50%) translateY(0);}
+
+@media(max-width:600px){
+  header{padding:.6rem 1rem;}
+  .logo{font-size:1.1rem;}
+  .tab-btn{padding:5px 10px;font-size:.62rem;}
+  .editor-wrap{padding:1rem;}
+}
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor">⚽</div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- LIGHTBOX -->
+<div class="lightbox" id="lightbox">
+  <div class="lightbox-inner">
+    <button class="lightbox-close" onclick="closeLightbox()">✕ CERRAR</button>
+    <img id="lightboxImg" src="" alt="">
+    <div class="lightbox-info">
+      <span class="li-team" id="lightboxTeam"></span>
+      <span class="li-note" id="lightboxNote"></span>
+      <button class="lightbox-download" onclick="downloadSinglePhoto()">⬇ Descargar</button>
+      <button class="lightbox-delete" onclick="deletePhoto()">✕ Eliminar</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- HEADER -->
+<header>
+  <div class="logo">Mural <span>·</span> 2026</div>
+  <div class="header-tabs">
+    <button class="tab-btn active" onclick="switchView('mural',this)">🖼️ Mural</button>
+    <button class="tab-btn" onclick="switchView('editor',this)">✏️ Crear</button>
+  </div>
+  <a href="../index.html" class="back-btn">← Volver</a>
+</header>
+
+<!-- ═══ MURAL VIEW ═══ -->
+<div class="view active" id="view-mural">
+  <div class="mural-hero">
+    <h1>El Mural del <span>Camerino</span></h1>
+    <p>Cada grupo deja su huella. Máximo 5 fotos por equipo.</p>
+    <div class="mural-stats">
+      <div class="mstat"><div class="mstat-n" id="totalFotos">0</div><div class="mstat-l">Fotos</div></div>
+      <div class="mstat"><div class="mstat-n" id="totalEquipos">0</div><div class="mstat-l">Equipos</div></div>
+      <div class="mstat"><div class="mstat-n" id="slotsLibres">50</div><div class="mstat-l">Slots libres</div></div>
+    </div>
+  </div>
+
+  <div class="team-filter" id="teamFilter">
+    <button class="tf-btn active" onclick="filterMural('all',this)">🌍 Todos</button>
+  </div>
+
+  <div class="polaroid-wall" id="muralWall"></div>
+</div>
+
+<!-- ═══ EDITOR VIEW ═══ -->
+<div class="view" id="view-editor">
+  <div class="editor-wrap">
+
+    <!-- CANVAS -->
+    <div>
+      <div class="status-bar" id="statusBar"></div>
+      <div class="canvas-container">
+        <div class="canvas-header">
+          <h3>Editor de foto</h3>
+          <div class="canvas-actions">
+            <button class="icon-btn" onclick="undoLast()">↩ Deshacer</button>
+            <button class="icon-btn" onclick="clearCanvas()">🗑 Limpiar</button>
+          </div>
+        </div>
+        <!-- Upload zone -->
+        <div class="upload-zone" id="uploadZone" onclick="document.getElementById('fileInput').click()">
+          <div class="upload-dashed">
+            <div class="upload-icon">📸</div>
+            <div class="upload-title">Sube tu foto</div>
+            <div class="upload-sub">Arrastra aquí o toca para seleccionar<br><small style="opacity:.6">JPG, PNG · Celular o PC</small></div>
+          </div>
+        </div>
+        <input type="file" id="fileInput" accept="image/*" capture="environment">
+        <canvas id="mainCanvas"></canvas>
+      </div>
+
+      <!-- OBJECT CONTROLS -->
+      <div class="tool-section" style="margin-top:12px;" id="objControls">
+        <div class="tool-title">Objeto seleccionado</div>
+        <div class="obj-controls">
+          <button class="obj-btn" onclick="rotateSelected(-15)">↺ -15°</button>
+          <button class="obj-btn" onclick="rotateSelected(15)">↻ +15°</button>
+          <button class="obj-btn" onclick="scaleSelected(0.85)">⊖ Menor</button>
+          <button class="obj-btn" onclick="scaleSelected(1.15)">⊕ Mayor</button>
+          <button class="obj-btn" onclick="bringToFront()">⬆ Frente</button>
+          <button class="obj-btn danger" onclick="deleteSelected()">✕ Borrar</button>
+        </div>
+        <div class="slider-wrap" style="margin-top:8px;">
+          <span style="font-family:'Barlow Condensed',sans-serif;font-size:.65rem;letter-spacing:1px;color:var(--muted);text-transform:uppercase;">Opacidad</span>
+          <input type="range" id="opacitySlider" min="10" max="100" value="100" oninput="changeOpacity(this.value)">
+          <span class="slider-val" id="opacityVal">100</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- TOOLS PANEL -->
+    <div class="tools-panel">
+
+      <!-- EQUIPO -->
+      <div class="tool-section">
+        <div class="tool-title">Mi equipo</div>
+        <div class="team-grid" id="teamGrid"></div>
+      </div>
+
+      <!-- FILTRO -->
+      <div class="tool-section">
+        <div class="tool-title">Filtro de color</div>
+        <div class="filter-grid" id="filterGrid">
+          <div class="filter-pick active" data-filter="none" onclick="applyFilter('none',this)">Normal</div>
+          <div class="filter-pick" data-filter="sepia" onclick="applyFilter('sepia',this)">Sepia</div>
+          <div class="filter-pick" data-filter="bw" onclick="applyFilter('bw',this)">B&W</div>
+          <div class="filter-pick" data-filter="vivid" onclick="applyFilter('vivid',this)">Vívido</div>
+          <div class="filter-pick" data-filter="warm" onclick="applyFilter('warm',this)">Cálido</div>
+          <div class="filter-pick" data-filter="cool" onclick="applyFilter('cool',this)">Frío</div>
+        </div>
+      </div>
+
+      <!-- MARCO -->
+      <div class="tool-section">
+        <div class="tool-title">Marco de equipo</div>
+        <div class="frame-grid" id="frameGrid"></div>
+      </div>
+
+      <!-- STICKERS -->
+      <div class="tool-section">
+        <div class="tool-title">Stickers</div>
+        <div class="sticker-grid" id="stickerGrid"></div>
+      </div>
+
+      <!-- TEXTO -->
+      <div class="tool-section">
+        <div class="tool-title">Texto</div>
+        <div class="text-input-wrap">
+          <input type="text" id="textInput" placeholder="Escribe algo..." maxlength="40">
+          <select id="fontSelect">
+            <option value="Bebas Neue">Bebas Neue — DEPORTIVO</option>
+            <option value="Barlow Condensed">Barlow Condensed</option>
+            <option value="Arial Black">Arial Black — BOLD</option>
+          </select>
+          <div class="slider-wrap">
+            <span style="font-family:'Barlow Condensed',sans-serif;font-size:.62rem;letter-spacing:1px;color:var(--muted);text-transform:uppercase;">Tamaño</span>
+            <input type="range" id="textSize" min="16" max="80" value="32">
+            <span class="slider-val" id="textSizeVal">32</span>
+          </div>
+          <div class="color-row" id="colorRow"></div>
+          <button class="add-text-btn" onclick="addText()">+ Agregar texto al canvas</button>
+        </div>
+      </div>
+
+      <!-- NOTA Y PUBLICAR -->
+      <div class="tool-section">
+        <div class="tool-title">Nota para el mural</div>
+        <textarea class="note-input" id="noteInput" placeholder="¡Arriba el equipo! 🔥"></textarea>
+        <div style="height:8px;"></div>
+        <input type="text" id="nameInput" placeholder="Tu nombre" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:var(--white);padding:7px 10px;font-family:'Barlow',sans-serif;font-size:.82rem;outline:none;width:100%;margin-bottom:8px;">
+        <button class="publish-btn" id="publishBtn" onclick="publishPhoto()"><span>⚽ PUBLICAR EN EL MURAL</span></button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+// ─── CURSOR ───
+const cursorEl=document.getElementById('cursor');
+const ringEl=document.getElementById('cursorRing');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;});
+(function ac(){cursorEl.style.left=mx+'px';cursorEl.style.top=my+'px';rx+=(mx-rx)*.1;ry+=(my-ry)*.1;ringEl.style.left=rx+'px';ringEl.style.top=ry+'px';requestAnimationFrame(ac);})();
+document.addEventListener('mousedown',()=>cursorEl.style.transform='translate(-50%,-50%) scale(1.4)');
+document.addEventListener('mouseup',()=>cursorEl.style.transform='translate(-50%,-50%) scale(1)');
+
+// ─── TEAMS DATA ───
+const TEAMS = [
+  {id:'GRP-01',flag:'🇪🇸',name:'España',       color:'#c60b1e',color2:'#ffc400'},
+  {id:'GRP-02',flag:'🇵🇹',name:'Portugal',      color:'#006600',color2:'#FF0000'},
+  {id:'GRP-03',flag:'🇧🇷',name:'Brasil',        color:'#009c3b',color2:'#FFDF00'},
+  {id:'GRP-04',flag:'🇦🇷',name:'Argentina',     color:'#74acdf',color2:'#ffffff'},
+  {id:'GRP-05',flag:'🇳🇱',name:'Países Bajos',  color:'#FF6600',color2:'#ffffff'},
+  {id:'GRP-06',flag:'🇩🇪',name:'Alemania',      color:'#000000',color2:'#FFCE00'},
+  {id:'GRP-07',flag:'🏴󠁧󠁢󠁥󠁮󠁧󠁿',name:'Inglaterra',    color:'#CF111A',color2:'#ffffff'},
+  {id:'GRP-08',flag:'🇲🇽',name:'México',        color:'#006847',color2:'#CE1126'},
+  {id:'GRP-09',flag:'🇧🇪',name:'Bélgica',       color:'#ED2939',color2:'#000000'},
+  {id:'GRP-10',flag:'🇺🇸',name:'Estados Unidos',color:'#002868',color2:'#BF0A30'},
+  {id:'GRP-11',flag:'🇨🇴',name:'Colombia',      color:'#FCD116',color2:'#003087'},
+  {id:'GRP-12',flag:'🇫🇷',name:'Francia',       color:'#002395',color2:'#ED2939'},
+];
+
+const STICKERS = ['⚽','🏆','🔥','❤️','🌟','👑','💪','🎯','🥳','🎉','🇨🇴','📸','🎶','🤩','😎','🦁','⚡','🏅','🎊','🌍','🥅','👟','🧤','📣','🎺'];
+const TEXT_COLORS = ['#ffffff','#FFD700','#FF4455','#00e676','#74acdf','#FF6600','#c9a84c','#000000','#ff69b4','#00ffff'];
+
+// ─── STATE ───
+let selectedTeam = null;
+let currentFilter = 'none';
+let selectedFrame = null;
+let photos = JSON.parse(localStorage.getItem('muralPhotos') || '[]');
+// photos: [{id, teamId, teamFlag, teamColor, dataUrl, note, name, timestamp}]
+
+// ─── CANVAS ENGINE ───
+const canvas = document.getElementById('mainCanvas');
+const ctx = canvas.getContext('2d');
+const CANVAS_SIZE = 1000;
+canvas.width = CANVAS_SIZE;
+canvas.height = CANVAS_SIZE;
+ctx.imageSmoothingEnabled = true;
+ctx.imageSmoothingQuality = 'high';
+
+let baseImage = null;
+let objects = []; // {type:'sticker'|'text', x,y, content, size, color, font, rotation, opacity, scale}
+let selectedObj = null;
+let isDragging = false;
+let dragOffX = 0, dragOffY = 0;
+let lastTouchDist = 0;
+let activeFilter = 'none';
+let activeFrame = null;
+let history = [];
+
+function saveHistory(){ history.push({objects:JSON.parse(JSON.stringify(objects))}); if(history.length>20)history.shift(); }
+
+function drawAll(){
+  ctx.clearRect(0,0,CANVAS_SIZE,CANVAS_SIZE);
+
+  // Base image with filter
+  if(baseImage){
+    ctx.save();
+    applyFilterCtx(activeFilter);
+    ctx.drawImage(baseImage,0,0,CANVAS_SIZE,CANVAS_SIZE);
+    ctx.restore();
+  } else {
+    ctx.fillStyle='#1a1a2e';
+    ctx.fillRect(0,0,CANVAS_SIZE,CANVAS_SIZE);
+    ctx.fillStyle='rgba(201,168,76,0.08)';
+    ctx.font='bold 80px Bebas Neue';
+    ctx.textAlign='center';
+    ctx.textBaseline='middle';
+    ctx.fillText('CSP 2026',CANVAS_SIZE/2,CANVAS_SIZE/2);
+  }
+
+  // Frame
+  if(activeFrame){
+    const t=CANVAS_SIZE;
+    const fw=18;
+    ctx.strokeStyle=activeFrame.color;
+    ctx.lineWidth=fw;
+    ctx.strokeRect(fw/2,fw/2,t-fw,t-fw);
+    ctx.strokeStyle=activeFrame.color2;
+    ctx.lineWidth=4;
+    ctx.strokeRect(fw+2,fw+2,t-fw*2-4,t-fw*2-4);
+  }
+
+  // Objects
+  objects.forEach((obj,i)=>{
+    ctx.save();
+    ctx.globalAlpha = obj.opacity||1;
+    ctx.translate(obj.x, obj.y);
+    ctx.rotate((obj.rotation||0)*Math.PI/180);
+    const sc = obj.scale||1;
+
+    if(obj.type==='sticker'){
+      ctx.font=`${obj.size*sc}px "Segoe UI Emoji","Apple Color Emoji","Noto Color Emoji",sans-serif`;
+      ctx.textAlign='center';
+      ctx.textBaseline='middle';
+      ctx.fillText(obj.content,0,0);
+    } else if(obj.type==='text'){
+      ctx.font=`bold ${obj.size*sc}px "${obj.font||'Bebas Neue'}"`;
+      ctx.textAlign='center';
+      ctx.textBaseline='middle';
+      ctx.fillStyle=obj.color||'#ffffff';
+      ctx.strokeStyle='rgba(0,0,0,0.6)';
+      ctx.lineWidth=3;
+      ctx.strokeText(obj.content,0,0);
+      ctx.fillText(obj.content,0,0);
+    }
+
+    // Selection highlight
+    if(selectedObj===obj){
+      const hw = obj.type==='sticker'?obj.size*sc/2+8:ctx.measureText(obj.content).width/2+8;
+      const hh = obj.size*sc/2+8;
+      ctx.strokeStyle='rgba(201,168,76,0.8)';
+      ctx.lineWidth=1.5;
+      ctx.setLineDash([4,4]);
+      ctx.strokeRect(-hw,-hh,hw*2,hh*2);
+      ctx.setLineDash([]);
+    }
+    ctx.restore();
+  });
+}
+
+function applyFilterCtx(f){
+  switch(f){
+    case 'sepia': ctx.filter='sepia(0.8) contrast(1.1)'; break;
+    case 'bw': ctx.filter='grayscale(1) contrast(1.2)'; break;
+    case 'vivid': ctx.filter='saturate(2) contrast(1.15)'; break;
+    case 'warm': ctx.filter='sepia(0.3) saturate(1.4) brightness(1.05)'; break;
+    case 'cool': ctx.filter='hue-rotate(200deg) saturate(0.9)'; break;
+    default: ctx.filter='none';
+  }
+}
+
+// ─── FILE UPLOAD ───
+document.getElementById('fileInput').addEventListener('change', e=>{
+  const file = e.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = ev=>{
+    const img = new Image();
+    img.onload = ()=>{
+      baseImage = img;
+      document.getElementById('uploadZone').classList.add('hidden');
+      drawAll();
+    };
+    img.src = ev.target.result;
+  };
+  reader.readAsDataURL(file);
+});
+
+// Drag & drop on upload zone
+const uploadZone = document.getElementById('uploadZone');
+uploadZone.addEventListener('dragover',e=>{e.preventDefault();uploadZone.style.borderColor='var(--gold)';});
+uploadZone.addEventListener('dragleave',()=>{uploadZone.style.borderColor='';});
+uploadZone.addEventListener('drop',e=>{
+  e.preventDefault();
+  const file=e.dataTransfer.files[0];
+  if(file&&file.type.startsWith('image/')){
+    const input=document.getElementById('fileInput');
+    const dt=new DataTransfer();dt.items.add(file);input.files=dt.files;
+    input.dispatchEvent(new Event('change'));
+  }
+});
+
+// ─── CANVAS INTERACTION ───
+function getObjAt(x,y){
+  for(let i=objects.length-1;i>=0;i--){
+    const o=objects[i];
+    const sc=o.scale||1;
+    const hw=o.size*sc/2+12;
+    const dx=x-o.x, dy=y-o.y;
+    const cosA=Math.cos(-(o.rotation||0)*Math.PI/180);
+    const sinA=Math.sin(-(o.rotation||0)*Math.PI/180);
+    const rx2=dx*cosA-dy*sinA, ry2=dx*sinA+dy*cosA;
+    if(Math.abs(rx2)<hw&&Math.abs(ry2)<hw) return o;
+  }
+  return null;
+}
+
+function getCanvasPos(e){
+  const rect=canvas.getBoundingClientRect();
+  const scaleX=CANVAS_SIZE/rect.width, scaleY=CANVAS_SIZE/rect.height;
+  if(e.touches) return {x:(e.touches[0].clientX-rect.left)*scaleX, y:(e.touches[0].clientY-rect.top)*scaleY};
+  return {x:(e.clientX-rect.left)*scaleX, y:(e.clientY-rect.top)*scaleY};
+}
+
+canvas.addEventListener('mousedown', startDrag);
+canvas.addEventListener('touchstart', e=>{e.preventDefault();startDrag(e);},{passive:false});
+canvas.addEventListener('mousemove', moveDrag);
+canvas.addEventListener('touchmove', e=>{e.preventDefault();
+  if(e.touches.length===2){
+    const d=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);
+    if(lastTouchDist&&selectedObj){const ratio=d/lastTouchDist;selectedObj.scale=(selectedObj.scale||1)*ratio;drawAll();}
+    lastTouchDist=d;return;
+  }
+  lastTouchDist=0;moveDrag(e);
+},{passive:false});
+canvas.addEventListener('mouseup',()=>{isDragging=false;});
+canvas.addEventListener('touchend',()=>{isDragging=false;lastTouchDist=0;});
+
+function startDrag(e){
+  const pos=getCanvasPos(e);
+  const hit=getObjAt(pos.x,pos.y);
+  selectedObj=hit;
+  if(hit){isDragging=true;dragOffX=pos.x-hit.x;dragOffY=pos.y-hit.y;document.getElementById('opacitySlider').value=Math.round((hit.opacity||1)*100);document.getElementById('opacityVal').textContent=Math.round((hit.opacity||1)*100);}
+  drawAll();
+}
+
+function moveDrag(e){
+  if(!isDragging||!selectedObj) return;
+  const pos=getCanvasPos(e);
+  selectedObj.x=Math.max(10,Math.min(CANVAS_SIZE-10,pos.x-dragOffX));
+  selectedObj.y=Math.max(10,Math.min(CANVAS_SIZE-10,pos.y-dragOffY));
+  drawAll();
+}
+
+// ─── OBJECT CONTROLS ───
+function rotateSelected(deg){ if(selectedObj){saveHistory();selectedObj.rotation=(selectedObj.rotation||0)+deg;drawAll();} }
+function scaleSelected(f){ if(selectedObj){saveHistory();selectedObj.scale=(selectedObj.scale||1)*f;drawAll();} }
+function bringToFront(){ if(selectedObj){const i=objects.indexOf(selectedObj);objects.splice(i,1);objects.push(selectedObj);drawAll();} }
+function deleteSelected(){ if(selectedObj){saveHistory();objects.splice(objects.indexOf(selectedObj),1);selectedObj=null;drawAll();} }
+function changeOpacity(v){ if(selectedObj){selectedObj.opacity=v/100;document.getElementById('opacityVal').textContent=v;drawAll();} }
+function undoLast(){ if(history.length){const s=history.pop();objects=s.objects;drawAll();} }
+function clearCanvas(){ if(confirm('¿Limpiar todo?')){objects=[];baseImage=null;activeFilter='none';activeFrame=null;document.getElementById('uploadZone').classList.remove('hidden');drawAll();} }
+
+// ─── ADD STICKER ───
+function addSticker(emoji){
+  if(!baseImage){showToast('Primero sube una foto 📸');return;}
+  saveHistory();
+  objects.push({type:'sticker',content:emoji,x:CANVAS_SIZE/2+Math.random()*60-30,y:CANVAS_SIZE/2+Math.random()*60-30,size:52,rotation:Math.random()*20-10,scale:1,opacity:1});
+  drawAll();
+}
+
+// ─── ADD TEXT ───
+function addText(){
+  const txt=document.getElementById('textInput').value.trim();
+  if(!txt){showToast('Escribe algo primero ✏️');return;}
+  if(!baseImage){showToast('Primero sube una foto 📸');return;}
+  saveHistory();
+  const color=document.querySelector('.color-dot.active')?.style.background||'#ffffff';
+  const font=document.getElementById('fontSelect').value;
+  const size=parseInt(document.getElementById('textSize').value);
+  objects.push({type:'text',content:txt,x:CANVAS_SIZE/2,y:CANVAS_SIZE/2+Math.random()*40-20,size,color,font,rotation:0,scale:1,opacity:1});
+  drawAll();
+  document.getElementById('textInput').value='';
+}
+
+// ─── FILTER ───
+function applyFilter(f, el){
+  activeFilter=f;
+  document.querySelectorAll('.filter-pick').forEach(x=>x.classList.remove('active'));
+  el.classList.add('active');
+  drawAll();
+}
+
+// ─── FRAME ───
+function applyFrame(team, el){
+  activeFrame = team ? {color:team.color, color2:team.color2} : null;
+  document.querySelectorAll('.frame-pick').forEach(x=>x.classList.remove('active'));
+  if(el) el.classList.add('active');
+  drawAll();
+}
+
+// ─── TEAM SELECT ───
+function selectTeam(teamId, el){
+  const team = TEAMS.find(t=>t.id===teamId);
+  const count = photos.filter(p=>p.teamId===teamId).length;
+  if(count>=5){showToast(`${team.flag} Ya tiene 5 fotos. Equipo completo.`);return;}
+  selectedTeam=teamId;
+  document.querySelectorAll('.team-pick').forEach(x=>x.classList.remove('selected'));
+  el.classList.add('selected');
+  // Auto-apply frame
+  applyFrame(team, document.querySelector(`.frame-pick[data-team="${teamId}"]`));
+}
+
+// ─── PUBLISH ───
+function publishPhoto(){
+  if(!baseImage){showToast('Primero sube una foto 📸');return;}
+  if(!selectedTeam){showToast('Selecciona tu equipo 🌍');return;}
+  const name=document.getElementById('nameInput').value.trim();
+  if(!name){showToast('Escribe tu nombre ✍️');return;}
+
+  const count=photos.filter(p=>p.teamId===selectedTeam).length;
+  if(count>=5){showToast('¡Tu equipo ya tiene 5 fotos!');return;}
+
+  const note=document.getElementById('noteInput').value.trim();
+  const team=TEAMS.find(t=>t.id===selectedTeam);
+
+  // Export canvas
+  const dataUrl=canvas.toDataURL('image/jpeg',0.88);
+  const photo={
+    id:'ph_'+Date.now(),
+    teamId:selectedTeam,
+    teamFlag:team.flag,
+    teamName:team.name,
+    teamColor:team.color,
+    dataUrl,
+    note,
+    name,
+    timestamp:Date.now(),
+    order:Date.now()
+  };
+
+  photos.push(photo);
+  localStorage.setItem('muralPhotos',JSON.stringify(photos));
+
+  showToast('¡Foto publicada en el mural! 🎉');
+  setTimeout(()=>{switchView('mural',document.querySelector('[onclick*="mural"]'));},1200);
+  renderMural('all');
+  updateMuralStats();
+}
+
+// ─── HASH HELPER — rotación y variantes estables por foto ───
+function hashInt(str, seed=''){
+  let h=5381, s=str+seed;
+  for(let i=0;i<s.length;i++) h=((h<<5)+h)+s.charCodeAt(i);
+  return Math.abs(h);
+}
+
+// ─── MURAL RENDER — secciones por equipo con fan ───
+const FAN_ROTS = [-7, -3.5, 0, 3.5, 7];   // rotación base por posición
+const FAN_Y    = [22,  10,  0, 10, 22];   // desplazamiento vertical (px) — centro más alto
+const FAN_Z    = [1,   3,   5,  3,  1];   // z-index — centro encima
+
+function renderMural(filter){
+  const wall = document.getElementById('muralWall');
+  wall.innerHTML = '';
+
+  const teamsToRender = filter === 'all' ? TEAMS : TEAMS.filter(t => t.id === filter);
+  let rendered = 0;
+
+  teamsToRender.forEach(team => {
+    const teamPhotos = photos
+      .filter(p => p.teamId === team.id)
+      .sort((a, b) => (a.order || a.id) - (b.order || b.id));
+    if (filter === 'all' && teamPhotos.length === 0) return; // en "todos" omite equipos vacíos
+
+    rendered++;
+    const section = document.createElement('div');
+    section.className = 'team-section fade-up';
+    section.style.animationDelay = (rendered * 80) + 'ms';
+
+    // Cabecera del equipo
+    const pct = Math.round(teamPhotos.length / 5 * 100);
+    const hdr = document.createElement('div');
+    hdr.className = 'team-section-header';
+    hdr.innerHTML = `
+      <span class="tsh-flag">${team.flag}</span>
+      <span class="tsh-name">${team.name.toUpperCase()}</span>
+      <span class="tsh-count">${teamPhotos.length}/5</span>
+      <div class="tsh-bar"><div class="tsh-fill" style="width:${pct}%"></div></div>
+      <button class="tsh-dl" onclick="downloadCollage('${team.id}')">⬇ Collage</button>`;
+    section.appendChild(hdr);
+
+    // Fan de 5 posiciones
+    const fan = document.createElement('div');
+    fan.className = 'photo-fan';
+
+    // Distribuye las 5 posiciones uniformemente en el ancho disponible
+    // left: 0%, 18%, 36%, 54%, 72% → deja margen derecho para el ancho del polaroid
+    for (let i = 0; i < 5; i++) {
+      const leftPct = i * 18;
+      const baseRot = FAN_ROTS[i];
+      const topPx   = FAN_Y[i];
+      const zIdx    = FAN_Z[i];
+
+      if (i < teamPhotos.length) {
+        const ph = teamPhotos[i];
+        const extraRot = ((hashInt(ph.id, 'fan') % 40) - 20) / 10; // ±2°
+        const rot = (baseRot + extraRot).toFixed(1);
+        const decRand = hashInt(ph.id, 'dec') % 3;
+        const decClass = decRand === 0 ? 'pol-taped' : decRand === 1 ? 'pol-taped-r' : 'pol-pinned';
+
+        const pol = document.createElement('div');
+        pol.className = `polaroid ${decClass}`;
+        pol.style.cssText = `left:${leftPct}%;top:${topPx}px;transform:rotate(${rot}deg);z-index:${zIdx};`;
+        pol.draggable = true;
+        pol.dataset.slot = i;
+        pol.innerHTML = `
+          <div class="pol-canvas">
+            <img src="${ph.dataUrl}" alt="" style="width:100%;height:100%;object-fit:cover;">
+            <div class="pol-team">${ph.teamFlag}</div>
+          </div>
+          <div class="pol-note">${ph.name}${ph.note?' · '+ph.note:''}</div>`;
+
+        let didDrag = false;
+        pol.addEventListener('dragstart', e => {
+          didDrag = true;
+          dragState = { teamId: team.id, fromSlot: i };
+          e.dataTransfer.effectAllowed = 'move';
+          setTimeout(() => pol.classList.add('pol-dragging'), 0);
+        });
+        pol.addEventListener('dragend', () => {
+          pol.classList.remove('pol-dragging');
+          document.querySelectorAll('.pol-drag-over').forEach(el => el.classList.remove('pol-drag-over'));
+          dragState = null;
+          setTimeout(() => { didDrag = false; }, 0);
+        });
+        pol.addEventListener('dragover', e => {
+          e.preventDefault();
+          if (dragState && dragState.teamId === team.id && dragState.fromSlot !== i)
+            pol.classList.add('pol-drag-over');
+        });
+        pol.addEventListener('dragleave', () => pol.classList.remove('pol-drag-over'));
+        pol.addEventListener('drop', e => {
+          e.preventDefault();
+          pol.classList.remove('pol-drag-over');
+          if (!dragState || dragState.teamId !== team.id || dragState.fromSlot === i) return;
+          const tp = photos
+            .filter(p => p.teamId === team.id)
+            .sort((a, b) => (a.order || a.id) - (b.order || b.id));
+          const fromPh = tp[dragState.fromSlot];
+          const toPh   = tp[i];
+          if (!fromPh || !toPh) return;
+          const fi = photos.findIndex(p => p.id === fromPh.id);
+          const ti = photos.findIndex(p => p.id === toPh.id);
+          const fromOrd = photos[fi].order || photos[fi].id;
+          const toOrd   = photos[ti].order || photos[ti].id;
+          photos[fi].order = toOrd;
+          photos[ti].order = fromOrd;
+          localStorage.setItem('muralPhotos', JSON.stringify(photos));
+          const activeFilter = document.querySelector('.tf-btn.active')?.dataset?.team || 'all';
+          renderMural(activeFilter);
+        });
+        pol.onclick = () => { if (!didDrag) openLightbox(ph); };
+        fan.appendChild(pol);
+      } else {
+        // Slot vacío con forma de polaroid
+        const empty = document.createElement('div');
+        empty.className = 'pol-empty';
+        empty.style.cssText = `left:${leftPct}%;top:${topPx}px;transform:rotate(${baseRot}deg);z-index:${zIdx};`;
+        empty.innerHTML = `<div class="pe-flag">${team.flag}</div><div class="pe-label">Slot libre</div>`;
+        empty.onclick = () => switchView('editor', document.querySelector('[onclick*="editor"]'));
+        fan.appendChild(empty);
+      }
+    }
+
+    section.appendChild(fan);
+    wall.appendChild(section);
+  });
+
+  if (rendered === 0) {
+    wall.innerHTML = `<div class="empty-mural"><div class="big">📸</div><p style="font-family:'Barlow Condensed',sans-serif;font-size:.9rem;letter-spacing:2px;text-transform:uppercase;">Aún no hay fotos.<br>¡Sé el primero en publicar!</p></div>`;
+  }
+}
+
+function updateMuralStats(){
+  const total=photos.length;
+  const equipos=new Set(photos.map(p=>p.teamId)).size;
+  document.getElementById('totalFotos').textContent=total;
+  document.getElementById('totalEquipos').textContent=equipos;
+  document.getElementById('slotsLibres').textContent=60-total;
+}
+
+function filterMural(teamId, el){
+  document.querySelectorAll('.tf-btn').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+  renderMural(teamId);
+}
+
+// ─── LIGHTBOX ───
+let activeLightboxId = null;
+let dragState = null;
+
+function openLightbox(ph){
+  activeLightboxId = ph.id;
+  document.getElementById('lightboxImg').src=ph.dataUrl;
+  document.getElementById('lightboxTeam').textContent=ph.teamFlag+' '+ph.teamName;
+  document.getElementById('lightboxNote').textContent=ph.note?`"${ph.note}" — ${ph.name}`:ph.name;
+  document.getElementById('lightbox').classList.add('open');
+}
+function closeLightbox(){
+  document.getElementById('lightbox').classList.remove('open');
+  activeLightboxId = null;
+}
+function deletePhoto(){
+  if(!activeLightboxId) return;
+  if(!confirm('¿Eliminar esta foto del mural?')) return;
+  photos = photos.filter(p => p.id !== activeLightboxId);
+  localStorage.setItem('muralPhotos', JSON.stringify(photos));
+  closeLightbox();
+  renderMural(document.querySelector('.tf-btn.active')?.dataset?.team || 'all');
+  updateMuralStats();
+  showToast('Foto eliminada del mural');
+}
+function downloadSinglePhoto(){
+  if(!activeLightboxId) return;
+  const ph = photos.find(p => p.id === activeLightboxId);
+  if(!ph) return;
+
+  // Re-renderiza a 2× para mejor calidad en pantallas de alta resolución
+  const SIZE = 2000;
+  const off = document.createElement('canvas');
+  off.width = SIZE; off.height = SIZE;
+  const c = off.getContext('2d');
+  c.imageSmoothingEnabled = true;
+  c.imageSmoothingQuality = 'high';
+
+  const img = new Image();
+  img.onload = () => {
+    c.drawImage(img, 0, 0, SIZE, SIZE);
+
+    // Marca de agua discreta
+    c.font = '500 28px "Barlow Condensed", sans-serif';
+    c.fillStyle = 'rgba(201,168,76,0.55)';
+    c.textAlign = 'right';
+    c.fillText('COPA SERVICIOS PÚBLICOS 2026', SIZE - 24, SIZE - 24);
+
+    const a = document.createElement('a');
+    a.download = `mural_${ph.teamName.replace(/\s+/g,'_')}_csp2026.jpg`;
+    a.href = off.toDataURL('image/jpeg', 0.95);
+    a.click();
+  };
+  img.src = ph.dataUrl;
+}
+document.getElementById('lightbox').addEventListener('click',e=>{if(e.target===document.getElementById('lightbox'))closeLightbox();});
+
+// ─── TOAST ───
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2200);
+}
+
+// ─── VIEW SWITCH ───
+function switchView(id, btn){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.getElementById('view-'+id).classList.add('active');
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  if(id==='mural'){renderMural('all');updateMuralStats();}
+}
+
+// ─── BUILD UI ───
+function buildUI(){
+  // Team grid (editor)
+  const tg=document.getElementById('teamGrid');
+  TEAMS.forEach(t=>{
+    const count=photos.filter(p=>p.teamId===t.id).length;
+    const full=count>=5;
+    const d=document.createElement('div');
+    d.className='team-pick'+(full?' full':'');
+    d.innerHTML=`${t.flag}<span class="tcount">${count}/5</span>`;
+    d.title=t.name;
+    if(!full) d.onclick=()=>selectTeam(t.id,d);
+    tg.appendChild(d);
+  });
+
+  // Frame grid
+  const fg=document.getElementById('frameGrid');
+  // No frame option
+  const nf=document.createElement('div');
+  nf.className='frame-pick active';
+  nf.style.cssText='background:rgba(255,255,255,0.04);border:2px solid rgba(255,255,255,0.1);display:flex;align-items:center;justify-content:center;font-size:.6rem;color:var(--muted);font-family:Barlow Condensed,sans-serif;';
+  nf.textContent='Sin marco';
+  nf.onclick=()=>applyFrame(null,nf);
+  fg.appendChild(nf);
+
+  TEAMS.forEach(t=>{
+    const fp=document.createElement('div');
+    fp.className='frame-pick';
+    fp.dataset.team=t.id;
+    fp.style.cssText=`background:linear-gradient(135deg,${t.color} 0%,${t.color2} 100%);`;
+    fp.innerHTML=`<span style="font-size:.9rem">${t.flag}</span>`;
+    fp.title=t.name;
+    fp.onclick=()=>applyFrame(t,fp);
+    fg.appendChild(fp);
+  });
+
+  // Stickers
+  const sg=document.getElementById('stickerGrid');
+  STICKERS.forEach(s=>{
+    const b=document.createElement('div');
+    b.className='sticker-btn';
+    b.textContent=s;
+    b.onclick=()=>addSticker(s);
+    sg.appendChild(b);
+  });
+
+  // Colors
+  const cr=document.getElementById('colorRow');
+  TEXT_COLORS.forEach((c,i)=>{
+    const d=document.createElement('div');
+    d.className='color-dot'+(i===0?' active':'');
+    d.style.background=c;
+    d.style.border=c==='#ffffff'?'2px solid rgba(255,255,255,0.3)':'';
+    d.onclick=()=>{document.querySelectorAll('.color-dot').forEach(x=>x.classList.remove('active'));d.classList.add('active');};
+    cr.appendChild(d);
+  });
+
+  // Team filter (mural)
+  const tf=document.getElementById('teamFilter');
+  TEAMS.forEach(t=>{
+    const b=document.createElement('button');
+    b.className='tf-btn';
+    b.innerHTML=`${t.flag} ${t.name}`;
+    b.dataset.team=t.id;
+    b.onclick=()=>filterMural(t.id,b);
+    b.innerHTML=`${t.flag} ${t.name}<span class="tf-dl" onclick="event.stopPropagation();downloadCollage('${t.id}')" title="Descargar collage">⬇</span>`;
+    tf.appendChild(b);
+  });
+
+  // Text size slider
+  document.getElementById('textSize').oninput=function(){document.getElementById('textSizeVal').textContent=this.value;};
+}
+
+// ─── COLLAGE DOWNLOAD ───
+async function downloadCollage(teamId) {
+  const team = TEAMS.find(t => t.id === teamId);
+  const teamPhotos = photos.filter(p => p.teamId === teamId);
+  if (!teamPhotos.length) { showToast(`${team.flag} Sin fotos aún para generar collage`); return; }
+
+  showToast('Generando collage… ⏳');
+  await document.fonts.ready;
+
+  const imgs = await Promise.all(teamPhotos.map(ph => new Promise(res => {
+    const img = new Image();
+    img.onload = () => res(img);
+    img.src = ph.dataUrl;
+  })));
+
+  const W = 3200, H = 2650;
+  const off = document.createElement('canvas');
+  off.width = W; off.height = H;
+  const c = off.getContext('2d');
+  c.imageSmoothingEnabled = true;
+  c.imageSmoothingQuality = 'high';
+
+  // ── FONDO: base oscura ──────────────────────────────────────
+  const bg = c.createLinearGradient(0, 0, 0, H);
+  bg.addColorStop(0, '#050c1e');
+  bg.addColorStop(0.55, '#060d1f');
+  bg.addColorStop(1, '#030810');
+  c.fillStyle = bg; c.fillRect(0, 0, W, H);
+
+  // ── Líneas de energía diagonales (efecto estadio) ────────────
+  c.save();
+  c.globalAlpha = 0.055;
+  for (let i = 0; i < 10; i++) {
+    const lx = -400 + i * 420;
+    c.beginPath();
+    c.moveTo(lx, H + 200);
+    c.lineTo(lx + W * 0.55, -200);
+    c.strokeStyle = team.color;
+    c.lineWidth = 90;
+    c.stroke();
+  }
+  c.globalAlpha = 1;
+  c.restore();
+
+  // ── Halo radial del equipo desde arriba (spotlight) ──────────
+  const halo = c.createRadialGradient(W/2, -80, 0, W/2, -80, H * 0.82);
+  halo.addColorStop(0,   team.color + 'bb');
+  halo.addColorStop(0.28, team.color + '44');
+  halo.addColorStop(0.55, team.color + '18');
+  halo.addColorStop(1,   'transparent');
+  c.fillStyle = halo; c.fillRect(0, 0, W, H);
+
+  // ── Halo secundario (color2) desde abajo ────────────────────
+  const halo2 = c.createRadialGradient(W/2, H + 100, 0, W/2, H + 100, H * 0.65);
+  halo2.addColorStop(0,   team.color2 + '66');
+  halo2.addColorStop(0.4, team.color2 + '1a');
+  halo2.addColorStop(1,  'transparent');
+  c.fillStyle = halo2; c.fillRect(0, 0, W, H);
+
+  // ── Acento diagonal esquina sup-derecha ─────────────────────
+  c.save();
+  const d1 = c.createLinearGradient(W, 0, W - 700, 700);
+  d1.addColorStop(0, team.color + '55'); d1.addColorStop(1, 'transparent');
+  c.fillStyle = d1;
+  c.beginPath(); c.moveTo(W,0); c.lineTo(W-600,0); c.lineTo(W,600); c.closePath(); c.fill();
+  c.restore();
+
+  // ── Acento diagonal esquina inf-izquierda ────────────────────
+  c.save();
+  const d2 = c.createLinearGradient(0, H, 700, H-700);
+  d2.addColorStop(0, team.color2 + '44'); d2.addColorStop(1, 'transparent');
+  c.fillStyle = d2;
+  c.beginPath(); c.moveTo(0,H); c.lineTo(600,H); c.lineTo(0,H-600); c.closePath(); c.fill();
+  c.restore();
+
+  // ── Estrellas / confeti disperso ────────────────────────────
+  const seed = hashInt(team.id, 'stars26');
+  for (let i = 0; i < 160; i++) {
+    const px = ((seed * (i * 137 + 7)) % (W - 40)) + 20;
+    const py = ((seed * (i * 89  + 3)) % (H - 40)) + 20;
+    const r  = i % 7 === 0 ? 5 : i % 3 === 0 ? 3 : 1.8;
+    const a  = 0.08 + (i % 6) * 0.04;
+    c.beginPath(); c.arc(Math.abs(px), Math.abs(py), r, 0, Math.PI*2);
+    c.fillStyle = i % 4 === 0
+      ? `rgba(201,168,76,${a})`
+      : `rgba(255,255,255,${a * 0.6})`;
+    c.fill();
+  }
+
+  // ── Banda superior del color del equipo ─────────────────────
+  const topBand = c.createLinearGradient(0, 0, 0, 220);
+  topBand.addColorStop(0, team.color + 'dd');
+  topBand.addColorStop(0.6, team.color + '44');
+  topBand.addColorStop(1, 'transparent');
+  c.fillStyle = topBand; c.fillRect(0, 0, W, 220);
+
+  // ── Glow inferior ───────────────────────────────────────────
+  const botBand = c.createLinearGradient(0, H - 120, 0, H);
+  botBand.addColorStop(0, 'transparent');
+  botBand.addColorStop(1, team.color + '99');
+  c.fillStyle = botBand; c.fillRect(0, H - 120, W, 120);
+
+  // ── Línea dorada superior ────────────────────────────────────
+  const gl = c.createLinearGradient(0, 0, W, 0);
+  gl.addColorStop(0, 'transparent');
+  gl.addColorStop(0.25, 'rgba(201,168,76,.9)');
+  gl.addColorStop(0.75, 'rgba(201,168,76,.9)');
+  gl.addColorStop(1, 'transparent');
+  c.fillStyle = gl; c.fillRect(0, 0, W, 5);
+
+  // ── Línea dorada inferior ────────────────────────────────────
+  c.fillStyle = gl; c.fillRect(0, H - 5, W, 5);
+
+  // ── ENCABEZADO ───────────────────────────────────────────────
+  c.textAlign = 'center';
+
+  // Sombra del nombre
+  c.shadowColor = 'rgba(0,0,0,0.7)';
+  c.shadowBlur = 30; c.shadowOffsetX = 3; c.shadowOffsetY = 5;
+  c.fillStyle = '#ffffff';
+  c.font = 'bold 124px "Bebas Neue", sans-serif';
+  c.fillText(team.name.toUpperCase(), W / 2, 148);
+  c.shadowBlur = 0; c.shadowOffsetX = 0; c.shadowOffsetY = 0;
+
+  // Subrayado dorado del nombre
+  const nameW = c.measureText(team.name.toUpperCase()).width;
+  const lineGrad = c.createLinearGradient(W/2 - nameW/2, 0, W/2 + nameW/2, 0);
+  lineGrad.addColorStop(0, 'transparent');
+  lineGrad.addColorStop(0.2, '#c9a84c');
+  lineGrad.addColorStop(0.8, '#c9a84c');
+  lineGrad.addColorStop(1, 'transparent');
+  c.fillStyle = lineGrad; c.fillRect(W/2 - nameW/2, 156, nameW, 4);
+
+  // Subtítulo
+  c.fillStyle = 'rgba(255,255,255,0.5)';
+  c.font = '500 38px "Barlow Condensed", sans-serif';
+  c.letterSpacing = '4px';
+  c.fillText('COPA SERVICIOS PÚBLICOS 2026', W / 2, 210);
+  c.letterSpacing = '0px';
+
+  // Separador
+  const sep = c.createLinearGradient(W/2-500, 0, W/2+500, 0);
+  sep.addColorStop(0,'transparent'); sep.addColorStop(.5,'rgba(201,168,76,.4)'); sep.addColorStop(1,'transparent');
+  c.fillStyle = sep; c.fillRect(W/2-500, 232, 1000, 2);
+
+  // Disposición de polaroids
+  const polImg = 900, polPad = 18, polBot = 90;
+  const polW = polImg + polPad * 2, polH = polImg + polPad + polBot;
+  const gap = 55;
+  const n = teamPhotos.length;
+  const topCount = Math.min(3, n), botCount = n - topCount;
+
+  function drawRow(startIdx, count, yTop) {
+    const rowW = count * polW + (count - 1) * gap;
+    const startX = (W - rowW) / 2;
+    for (let i = 0; i < count; i++) {
+      drawPol(c, imgs[startIdx + i], teamPhotos[startIdx + i], team,
+        startX + i * (polW + gap), yTop, polImg, polPad, polBot);
+    }
+  }
+
+  const topY = 285;
+  drawRow(0, topCount, topY);
+  if (botCount > 0) drawRow(topCount, botCount, topY + polH + 75);
+
+  // Pie de página
+  c.textAlign = 'center';
+  c.fillStyle = 'rgba(201,168,76,0.55)';
+  c.font = '500 30px "Barlow Condensed", sans-serif';
+  c.fillText('SUBSECRETARÍA DE SERVICIOS PÚBLICOS  ·  ALCALDÍA DE MEDELLÍN  ·  2026', W / 2, H - 44);
+
+  // Descarga en JPEG alta calidad (menor peso que PNG, mejor calidad visual)
+  const a = document.createElement('a');
+  a.download = `collage-${team.name.toLowerCase().replace(/\s+/g, '-')}-csp2026.jpg`;
+  a.href = off.toDataURL('image/jpeg', 0.95);
+  a.click();
+  showToast(`¡Collage de ${team.name} descargado! 🎉`);
+}
+
+function drawPol(c, img, ph, team, x, y, polImg, polPad, polBot) {
+  const polW = polImg + polPad * 2, polH = polImg + polPad + polBot;
+  const rot = ((hashInt(ph.id, 'colrot') % 120) - 60) / 10;
+
+  c.save();
+  c.imageSmoothingEnabled = true;
+  c.imageSmoothingQuality = 'high';
+  c.translate(x + polW / 2, y + polH / 2);
+  c.rotate(rot * Math.PI / 180);
+
+  // Sombra
+  c.shadowColor = 'rgba(0,0,0,0.7)';
+  c.shadowBlur = 55; c.shadowOffsetX = 8; c.shadowOffsetY = 20;
+  c.fillStyle = '#fefcf6';
+  c.fillRect(-polW / 2, -polH / 2, polW, polH);
+  c.shadowColor = 'transparent'; c.shadowBlur = 0; c.shadowOffsetX = 0; c.shadowOffsetY = 0;
+
+  // Foto
+  c.drawImage(img, -polW / 2 + polPad, -polH / 2 + polPad, polImg, polImg);
+
+  // Marco del color del equipo
+  c.strokeStyle = team.color; c.lineWidth = 11;
+  c.strokeRect(-polW / 2 + polPad, -polH / 2 + polPad, polImg, polImg);
+
+  // Nombre y nota
+  c.fillStyle = '#2a2a2a';
+  c.font = '700 42px "Barlow Condensed", sans-serif';
+  c.textAlign = 'center';
+  const label = ph.name + (ph.note ? ' · ' + ph.note : '');
+  c.fillText(label.length > 32 ? label.slice(0, 31) + '…' : label, 0, polH / 2 - 18);
+
+  c.restore();
+}
+
+// ─── INIT ───
+buildUI();
+renderMural('all');
+updateMuralStats();
+drawAll();
+
+// Redraw loop for canvas
+(function loop(){drawAll();requestAnimationFrame(loop);})();
+</script>
+</body>
+</html>
