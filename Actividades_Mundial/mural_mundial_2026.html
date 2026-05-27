@@ -444,6 +444,9 @@ document.addEventListener('mousedown',()=>cursorEl.style.transform='translate(-5
 document.addEventListener('mouseup',()=>cursorEl.style.transform='translate(-50%,-50%) scale(1)');
 
 // ─── TEAMS DATA ───
+// ─── API (misma URL del Apps Script) ───
+const MURAL_API = 'https://script.google.com/macros/s/AKfycbz7j0wpPiUPCV0tTRm9XFPMh59I6KDnCH3Bafgr44qkVY2SJ5lEZ9rQgBkhiGk4JO-JNQ/exec';
+
 const TEAMS = [
   {id:'GRP-01',flag:'🇪🇸',name:'España',       color:'#c60b1e',color2:'#ffc400'},
   {id:'GRP-02',flag:'🇵🇹',name:'Portugal',      color:'#006600',color2:'#FF0000'},
@@ -741,12 +744,87 @@ function publishPhoto(){
   };
 
   photos.push(photo);
-  localStorage.setItem('muralPhotos',JSON.stringify(photos));
+  localStorage.setItem('muralPhotos', JSON.stringify(photos));
 
-  showToast('¡Foto publicada en el mural! 🎉');
-  setTimeout(()=>{switchView('mural',document.querySelector('[onclick*="mural"]'));},1200);
+  showToast('¡Foto publicada! Sincronizando… 📤');
   renderMural('all');
   updateMuralStats();
+
+  // Enviar al API para que todos los dispositivos la vean
+  enviarFotoAlAPI(photo);
+
+  setTimeout(() => { switchView('mural', document.querySelector('[onclick*="mural"]')); }, 1200);
+}
+
+// ─── SINCRONIZACIÓN CON API ──────────────────────────────────
+async function enviarFotoAlAPI(photo) {
+  try {
+    const res = await fetch(MURAL_API, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify({
+        action:    'subirFoto',
+        teamId:    photo.teamId,
+        teamName:  photo.teamName,
+        dataUrl:   photo.dataUrl,
+        nombre:    photo.name,
+        note:      photo.note,
+        timestamp: photo.timestamp
+      })
+    });
+    const data = await res.json();
+    if (data.ok) {
+      // Guardar driveUrl en localStorage para no re-subir
+      const idx = photos.findIndex(p => p.id === photo.id);
+      if (idx > -1) {
+        photos[idx].driveUrl = data.driveUrl;
+        photos[idx].fileId   = data.fileId;
+        localStorage.setItem('muralPhotos', JSON.stringify(photos));
+      }
+      showToast('¡Foto visible para todos! ✅');
+    }
+  } catch(e) {
+    console.warn('No se pudo sincronizar con el API:', e);
+    showToast('Guardada localmente (sin conexión)');
+  }
+}
+
+async function cargarFotosDesdeAPI() {
+  try {
+    const res  = await fetch(`${MURAL_API}?action=fotos`);
+    const data = await res.json();
+    if (!data.ok || !data.data || !data.data.length) return;
+
+    // Convertir fotos del API al formato local
+    const apiPhotos = data.data.map(f => {
+      const team = TEAMS.find(t => t.id === f.teamId) || {};
+      return {
+        id:        'api_' + f.fileId,
+        teamId:    f.teamId,
+        teamFlag:  team.flag  || '',
+        teamName:  f.teamName,
+        teamColor: team.color || '#c9a84c',
+        driveUrl:  f.driveUrl,
+        dataUrl:   f.driveUrl, // fuente de imagen
+        note:      f.note   || '',
+        name:      f.nombre || '',
+        timestamp: Number(f.timestamp) || 0,
+        order:     Number(f.timestamp) || 0,
+        fileId:    f.fileId,
+        fromAPI:   true
+      };
+    });
+
+    // Fusionar: API es fuente de verdad; conservar fotos locales aún no subidas
+    const localPendientes = photos.filter(p => !p.fileId && !p.fromAPI);
+    photos = [...apiPhotos, ...localPendientes];
+    photos.sort((a, b) => b.timestamp - a.timestamp);
+
+    renderMural('all');
+    updateMuralStats();
+  } catch(e) {
+    console.warn('No se pudo cargar fotos del API:', e);
+  }
 }
 
 // ─── HASH HELPER — rotación y variantes estables por foto ───
@@ -967,7 +1045,7 @@ function switchView(id, btn){
   document.getElementById('view-'+id).classList.add('active');
   document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
   if(btn) btn.classList.add('active');
-  if(id==='mural'){renderMural('all');updateMuralStats();}
+  if(id==='mural'){ renderMural('all'); updateMuralStats(); cargarFotosDesdeAPI(); }
 }
 
 // ─── BUILD UI ───
@@ -1261,6 +1339,7 @@ buildUI();
 renderMural('all');
 updateMuralStats();
 drawAll();
+cargarFotosDesdeAPI(); // sincronizar con API al abrir
 
 // Redraw loop for canvas
 (function loop(){drawAll();requestAnimationFrame(loop);})();
