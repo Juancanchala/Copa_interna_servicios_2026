@@ -1957,7 +1957,7 @@ document.addEventListener('DOMContentLoaded', () => {
       });
       const data = await res.json();
       typing.remove();
-      addMsg(data.ok ? data.respuesta : 'Lo siento, no pude responder. Intenta de nuevo.', 'bot');
+      addMsg(data.ok ? data.respuesta : ('Error: ' + (data.error || 'sin detalle')), 'bot');
     } catch(e) {
       typing.remove();
       addMsg('Error de conexión. Verifica tu red e intenta de nuevo.', 'bot');
