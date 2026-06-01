@@ -979,8 +979,72 @@
     transform: scale(1.1);
     box-shadow: 0 6px 28px rgba(201,168,76,0.65), 0 0 0 4px rgba(201,168,76,0.35);
   }
-  .chat-fab-face { font-size: 1.6rem; line-height: 1; }
-  .chat-fab-ball { font-size: 0.85rem; line-height: 1; margin-top: -2px; }
+  /* Coach icon — gorra + cuerpo */
+  .coach-icon {
+    display: flex; flex-direction: column; align-items: center; gap: 1px;
+    pointer-events: none;
+  }
+  .coach-cap {
+    width: 34px; height: 13px; position: relative;
+  }
+  .coach-cap::before {
+    content: '';
+    position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+    width: 26px; height: 13px;
+    background: var(--gold);
+    border-radius: 13px 13px 0 0;
+  }
+  .coach-cap::after {
+    content: '';
+    position: absolute; bottom: 0; left: 2px;
+    width: 30px; height: 5px;
+    background: var(--gold-dark);
+    border-radius: 0 4px 4px 0;
+  }
+  .coach-face {
+    width: 22px; height: 19px;
+    background: #f5c99a;
+    border-radius: 50% 50% 45% 45%;
+    border: 1.5px solid rgba(0,0,0,0.12);
+    position: relative;
+  }
+  .coach-face::before {
+    content: '👁 👁';
+    position: absolute; top: 5px; left: 50%; transform: translateX(-50%);
+    font-size: 5px; letter-spacing: 2px; white-space: nowrap;
+  }
+  .coach-whistle {
+    font-size: 0.75rem; line-height: 1; margin-top: 0px;
+    filter: drop-shadow(0 1px 2px rgba(0,0,0,0.4));
+  }
+  /* Avatar Coach en el header del chat */
+  .coach-avatar-icon {
+    display: flex; flex-direction: column; align-items: center; gap: 1px;
+  }
+  .coach-avatar-icon .av-cap {
+    width: 28px; height: 11px; position: relative;
+  }
+  .coach-avatar-icon .av-cap::before {
+    content: '';
+    position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+    width: 22px; height: 11px;
+    background: var(--gold);
+    border-radius: 11px 11px 0 0;
+  }
+  .coach-avatar-icon .av-cap::after {
+    content: '';
+    position: absolute; bottom: 0; left: 1px;
+    width: 26px; height: 4px;
+    background: var(--gold-dark);
+    border-radius: 0 3px 3px 0;
+  }
+  .coach-avatar-icon .av-face {
+    width: 18px; height: 15px;
+    background: #f5c99a;
+    border-radius: 50% 50% 45% 45%;
+    border: 1px solid rgba(0,0,0,0.1);
+  }
+  .coach-avatar-icon .av-whistle { font-size: 0.65rem; line-height: 1; }
   @keyframes botFloat {
     0%, 100% { transform: translateY(0); }
     50% { transform: translateY(-5px); }
@@ -1715,16 +1779,25 @@
 </div><!-- /content -->
 
 <!-- ═══════ CHAT AGENT WIDGET ═══════ -->
-<button class="chat-fab" id="chatFab" title="Habla con Balín, el bot de la Copa">
-  <span class="chat-fab-face">🤖</span>
-  <span class="chat-fab-ball">⚽</span>
+<button class="chat-fab" id="chatFab" title="Habla con Coach, el asistente de la Copa">
+  <div class="coach-icon">
+    <div class="coach-cap"></div>
+    <div class="coach-face"></div>
+    <span class="coach-whistle">📋</span>
+  </div>
 </button>
 <div class="chat-panel" id="chatPanel">
   <div class="chat-header">
-    <div class="chat-avatar">🤖</div>
+    <div class="chat-avatar">
+      <div class="coach-avatar-icon">
+        <div class="av-cap"></div>
+        <div class="av-face"></div>
+        <span class="av-whistle">📋</span>
+      </div>
+    </div>
     <div class="chat-header-info">
-      <div class="chat-title">Balín · Bot de la Copa</div>
-      <div class="chat-subtitle">Tu asistente futbolero oficial 🏆</div>
+      <div class="chat-title">Coach · Bot de la Copa</div>
+      <div class="chat-subtitle">Tu entrenador digital oficial 🏆</div>
       <div class="chat-status"><span class="chat-status-dot"></span><span class="chat-status-text">En línea</span></div>
     </div>
     <button class="chat-close" id="chatClose" aria-label="Cerrar">✕</button>
@@ -1732,7 +1805,7 @@
   <div class="chat-messages" id="chatMessages">
     <div class="chat-msg bot">
       <div class="chat-bubble">
-        ¡Hola! Soy <strong>Balín</strong> 🤖⚽ el bot oficial de la <strong>Copa Servicios Públicos 2026</strong>.<br><br>
+        ¡Hola! Soy <strong>Coach</strong> 📋⚽ el asistente oficial de la <strong>Copa Servicios Públicos 2026</strong>.<br><br>
         Puedo contarte sobre puntajes, reglas del torneo y datos del Mundial FIFA 2026. ¡Toca una pregunta o escribe la tuya! 👇
       </div>
     </div>
@@ -1745,7 +1818,7 @@
     </div>
   </div>
   <div class="chat-input-row">
-    <input type="text" class="chat-input" id="chatInput" placeholder="Pregúntale a Balín algo..." autocomplete="off" maxlength="300">
+    <input type="text" class="chat-input" id="chatInput" placeholder="Pregúntale algo al Coach..." autocomplete="off" maxlength="300">
     <button class="chat-send" id="chatSend" aria-label="Enviar">&#10148;</button>
   </div>
 </div>
@@ -1960,7 +2033,7 @@ document.addEventListener('DOMContentLoaded', () => {
   setInterval(() => { cargarTabla(); cargarActividades(); }, 60000);
 });
 
-// ─── CHAT AGENT (Balín) ──────────────────────────────────────
+// ─── CHAT AGENT (Coach) ──────────────────────────────────────
 (function() {
   const fab      = document.getElementById('chatFab');
   const panel    = document.getElementById('chatPanel');
