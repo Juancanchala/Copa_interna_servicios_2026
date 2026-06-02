@@ -1995,10 +1995,17 @@ document.addEventListener('DOMContentLoaded', () => {
     send();
   });
 
+  function renderMd(text) {
+    return text
+      .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+      .replace(/\*(?!\*)\s(.+)/gm, '• $1')
+      .replace(/\n/g, '<br>');
+  }
+
   function addMsg(text, role) {
     const div = document.createElement('div');
     div.className = `chat-msg ${role}`;
-    div.innerHTML = `<div class="chat-bubble">${text.replace(/\n/g,'<br>')}</div>`;
+    div.innerHTML = `<div class="chat-bubble">${renderMd(text)}</div>`;
     msgs.appendChild(div);
     msgs.scrollTop = msgs.scrollHeight;
   }
