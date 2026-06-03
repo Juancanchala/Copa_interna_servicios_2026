@@ -1585,19 +1585,6 @@
     function startDrag(e){isDragging=true;paused=true;startX=e.pageX-c.offsetLeft;scrollLeft=c.scrollLeft;c.style.cursor='grabbing';}
     function onDrag(e){if(!isDragging)return;e.preventDefault();const x=e.pageX-c.offsetLeft;c.scrollLeft=scrollLeft-(x-startX)*1.5;}
     function endDrag(){isDragging=false;paused=false;c.style.cursor='grab';}
-    c.addEventListener('mouseenter',()=>paused=true);
-    c.addEventListener('mouseleave',()=>paused=false);
-    // Auto-scroll suave
-    let pos = 0;
-    function autoScroll(){
-      if(!paused){
-        pos += 1.2;
-        if(pos >= c.scrollWidth - c.clientWidth) pos = 0;
-        c.scrollLeft = pos;
-      }
-      requestAnimationFrame(autoScroll);
-    }
-    autoScroll();
   </script>
 
   <div class="gold-sep"></div>
