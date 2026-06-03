@@ -1179,15 +1179,58 @@
     margin: 5rem 0;
   }
 
+  /* ── HAMBURGER ── */
+  .hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; padding: 4px; background: none; border: none; }
+  .hamburger span { display: block; width: 22px; height: 2px; background: var(--gold); border-radius: 2px; transition: all .3s; }
+  .mobile-menu { display: none; position: fixed; inset: 0; z-index: 998; background: rgba(6,13,31,0.97); flex-direction: column; align-items: center; justify-content: center; gap: 2.5rem; }
+  .mobile-menu.open { display: flex; }
+  .mobile-menu a { font-family: 'Bebas Neue', sans-serif; font-size: 2.2rem; letter-spacing: 4px; color: var(--white); text-decoration: none; }
+  .mobile-menu a:hover { color: var(--gold); }
+  .mobile-menu-close { position: absolute; top: 1.5rem; right: 1.5rem; background: none; border: none; color: var(--muted); font-size: 1.8rem; cursor: pointer; }
+
   @media (max-width: 768px) {
+    /* Cursor oculto en móvil */
+    .cursor, .cursor-ring { display: none !important; }
+    body { cursor: auto; }
+
+    /* Nav */
     nav { padding: 1rem 1.5rem; }
     .nav-links { display: none; }
-    section { padding: 0 1.5rem 4rem; }
+    .hamburger { display: flex; }
+
+    /* Secciones */
+    section { padding: 0 1rem 3rem; }
+
+    /* Grids */
     .teams-grid { grid-template-columns: repeat(2, 1fr); }
     .stats-inner { grid-template-columns: repeat(2, 1fr); }
     .lb-top3 { grid-template-columns: 1fr; }
     .events-grid { grid-template-columns: 1fr; }
-    .hero-ctas { flex-direction: column; }
+    .hero-ctas { flex-direction: column; align-items: center; }
+    .hero-ctas .cta-primary, .hero-ctas .cta-secondary { width: 100%; max-width: 280px; text-align: center; }
+
+    /* Hero */
+    .hero { padding: 5rem 1.5rem 3rem; }
+    .hero-sub { font-size: 0.9rem; }
+
+    /* Carrusel */
+    #carrusel > div { width: 85vw !important; height: 56vw !important; }
+
+    /* Chat */
+    .chat-panel { bottom: 5.2rem; right: 0.5rem; width: calc(100vw - 1rem); }
+    .chat-fab { bottom: 1rem; right: 1rem; width: 54px; height: 54px; }
+
+    /* Tabla posiciones */
+    .lb-row { font-size: 0.82rem; padding: 0.6rem 0.8rem; }
+    .lb-header { font-size: 0.7rem; padding: 0.5rem 0.8rem; }
+    .pts-row { gap: 0.5rem; }
+    .pts-val { font-size: 0.9rem; }
+  }
+
+  @media (max-width: 480px) {
+    .teams-grid { grid-template-columns: 1fr; }
+    .stats-inner { grid-template-columns: 1fr 1fr; }
+    .section-title { font-size: clamp(2rem, 10vw, 3rem); }
   }
 </style>
 </head>
@@ -1208,8 +1251,21 @@
       <li><a href="#equipos">Equipos &amp; Tabla</a></li>
       <li><a href="#actividades">Actividades</a></li>
     </ul>
-    <button class="nav-pts-btn" onclick="document.getElementById('ptsModal').classList.add('open')" title="Tabla de puntos">?</button>
+    <div style="display:flex;align-items:center;gap:.75rem;">
+      <button class="nav-pts-btn" onclick="document.getElementById('ptsModal').classList.add('open')" title="Tabla de puntos">?</button>
+      <button class="hamburger" id="hambBtn" onclick="document.getElementById('mobileMenu').classList.add('open')" aria-label="Menú">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
   </nav>
+
+  <!-- MENÚ MÓVIL -->
+  <div class="mobile-menu" id="mobileMenu">
+    <button class="mobile-menu-close" onclick="document.getElementById('mobileMenu').classList.remove('open')">✕</button>
+    <a href="#equipos" onclick="document.getElementById('mobileMenu').classList.remove('open')">Equipos &amp; Tabla</a>
+    <a href="#actividades" onclick="document.getElementById('mobileMenu').classList.remove('open')">Actividades</a>
+    <a href="#" onclick="document.getElementById('mobileMenu').classList.remove('open');document.getElementById('ptsModal').classList.add('open')">Tabla de Puntos</a>
+  </div>
 
   <!-- MODAL TABLA DE PUNTOS -->
   <div class="pts-overlay" id="ptsModal" onclick="if(event.target===this)this.classList.remove('open')">
@@ -1581,10 +1637,15 @@
   </section>
   <script>
     const c = document.getElementById('carrusel');
-    let isDragging=false,startX=0,scrollLeft=0,paused=false;
-    function startDrag(e){isDragging=true;paused=true;startX=e.pageX-c.offsetLeft;scrollLeft=c.scrollLeft;c.style.cursor='grabbing';}
+    let isDragging=false,startX=0,scrollLeft=0;
+    // Mouse drag
+    function startDrag(e){isDragging=true;startX=e.pageX-c.offsetLeft;scrollLeft=c.scrollLeft;c.style.cursor='grabbing';}
     function onDrag(e){if(!isDragging)return;e.preventDefault();const x=e.pageX-c.offsetLeft;c.scrollLeft=scrollLeft-(x-startX)*1.5;}
-    function endDrag(){isDragging=false;paused=false;c.style.cursor='grab';}
+    function endDrag(){isDragging=false;c.style.cursor='grab';}
+    // Touch swipe
+    let touchStartX=0,touchScrollLeft=0;
+    c.addEventListener('touchstart',e=>{touchStartX=e.touches[0].clientX;touchScrollLeft=c.scrollLeft;},{passive:true});
+    c.addEventListener('touchmove',e=>{const dx=touchStartX-e.touches[0].clientX;c.scrollLeft=touchScrollLeft+dx;},{passive:true});
   </script>
 
   <div class="gold-sep"></div>
