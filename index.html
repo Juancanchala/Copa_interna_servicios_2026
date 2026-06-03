@@ -1221,16 +1221,28 @@
     .chat-fab { bottom: 1rem; right: 1rem; width: 54px; height: 54px; }
 
     /* Tabla posiciones */
-    .lb-row { font-size: 0.82rem; padding: 0.6rem 0.8rem; }
-    .lb-header { font-size: 0.7rem; padding: 0.5rem 0.8rem; }
+    .lb-row { font-size: 0.78rem; padding: 0.5rem 0.6rem; gap: 6px;
+              grid-template-columns: 24px 22px 1fr 80px 52px; }
+    .lb-header { font-size: 0.68rem; padding: 0.4rem 0.6rem; gap: 6px;
+                 grid-template-columns: 24px 22px 1fr 80px 52px; }
+    .lb-bar-wrap { max-width: 60px; }
     .pts-row { gap: 0.5rem; }
     .pts-val { font-size: 0.9rem; }
+
+    /* Tapazo card — no estirar en 1 columna */
+    .event-card.card-solo { max-width: 100%; }
+
+    /* Evitar desborde horizontal global */
+    .content { overflow-x: hidden; }
+    section { overflow-x: hidden; }
   }
 
   @media (max-width: 480px) {
     .teams-grid { grid-template-columns: 1fr; }
     .stats-inner { grid-template-columns: 1fr 1fr; }
     .section-title { font-size: clamp(2rem, 10vw, 3rem); }
+    .lb-row { grid-template-columns: 20px 20px 1fr 70px 44px; }
+    .lb-header { grid-template-columns: 20px 20px 1fr 70px 44px; }
   }
 </style>
 </head>
